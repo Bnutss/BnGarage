@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "127946917725",
+    "project_id": "bngarage-1",
+    "storage_bucket": "bngarage-1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:127946917725:android:928081dc5048c77816cab4",
+        "android_client_info": {
+          "package_name": "com.example.bngarage"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-zKHLd3gfQe8BazcT7ZMZGjMKbRAaeVM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

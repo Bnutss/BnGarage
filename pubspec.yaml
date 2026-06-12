@@ -1,0 +1,62 @@
+name: bngarage
+description: "A new Flutter project."
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_localizations:
+    sdk: flutter
+
+  # Локальная БД
+  sqflite: ^2.3.3
+  path: ^1.9.0
+  path_provider: ^2.1.4
+
+  # State management
+  flutter_riverpod: ^3.3.2
+  riverpod_annotation: ^4.0.3
+
+  # Навигация
+  go_router: ^17.3.0
+
+  # Уведомления
+  flutter_local_notifications: ^22.0.0
+
+  # Изображения
+  image_picker: ^1.2.2
+  cached_network_image: ^3.4.1
+
+  # UI
+  gap: ^3.0.1
+
+  # Настройки
+  shared_preferences: ^2.3.2
+
+  # Утилиты
+  uuid: ^4.5.1
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.12.0
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.15.0
+  freezed: ^3.2.5
+  json_serializable: ^6.14.0
+  riverpod_generator: ^4.0.4
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
