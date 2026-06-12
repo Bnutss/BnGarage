@@ -4,6 +4,14 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+import java.util.Properties
+
+val keyProperties = Properties()
+val keyPropertiesFile = rootProject.file("key.properties")
+if (keyPropertiesFile.exists()) {
+    keyProperties.load(keyPropertiesFile.inputStream())
+}
+
 android {
     namespace = "com.bnutss.bngarage"
     compileSdk = flutter.compileSdkVersion
@@ -25,21 +33,18 @@ android {
 
     signingConfigs {
         create("release") {
-            // Заполните перед сборкой:
-            // keyAlias, keyPassword, storeFile, storePassword
-            // Или используйте:flutter build apk --release
+            keyAlias = keyProperties["keyAlias"] as String?
+            keyPassword = keyProperties["keyPassword"] as String?
+            storeFile = keyProperties["storeFile"]?.let { file(it as String) }
+            storePassword = keyProperties["storePassword"] as String?
         }
     }
 
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }
