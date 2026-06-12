@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.bngarage"
+    namespace = "com.bnutss.bngarage"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -16,16 +16,30 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.bngarage"
+        applicationId = "com.bnutss.bngarage"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        create("release") {
+            // Заполните перед сборкой:
+            // keyAlias, keyPassword, storeFile, storePassword
+            // Или используйте:flutter build apk --release
+        }
+    }
+
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }
