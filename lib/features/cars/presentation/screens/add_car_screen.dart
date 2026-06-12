@@ -14,7 +14,7 @@ import '../providers/cars_provider.dart';
 const _kPrimary  = Color(0xFF185FA5);
 const _kPriLight = Color(0xFF2E86D4);
 const _kCyan     = Color(0xFF22D3EE);
-const _kDarkBg   = Color(0xFF0A0F1A);
+const _kDarkBg   = Color(0xFF000000);
 
 IconData _fuelIcon(String key) => switch (key) {
   'gasoline' => Icons.local_gas_station_rounded,
@@ -80,37 +80,26 @@ class _AddCarScreenState extends ConsumerState<AddCarScreen> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => ClipRRect(
-        borderRadius:
-            const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
           child: Container(
             decoration: BoxDecoration(
               color: isDark
-                  ? const Color(0xFF111827).withValues(alpha: 0.95)
+                  ? const Color(0xFF0A0A0F).withValues(alpha: 0.98)
                   : Colors.white.withValues(alpha: 0.97),
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(24)),
-              border: Border(
-                top: BorderSide(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.1)
-                      : Colors.black.withValues(alpha: 0.07),
-                ),
-              ),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             ),
             child: SafeArea(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    margin: const EdgeInsets.only(top: 12, bottom: 4),
-                    width: 36,
-                    height: 4,
+                    margin: const EdgeInsets.only(top: 10, bottom: 4),
+                    width: 32,
+                    height: 3,
                     decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.2)
-                          : Colors.black.withValues(alpha: 0.15),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -145,7 +134,7 @@ class _AddCarScreenState extends ConsumerState<AddCarScreen> {
                         setState(() => _photoPath = null);
                       },
                     ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                 ],
               ),
             ),
@@ -200,74 +189,6 @@ class _AddCarScreenState extends ConsumerState<AddCarScreen> {
     }
   }
 
-  InputDecoration _dec(String label, {IconData? icon, bool isDark = true, String? suffix}) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: TextStyle(
-        fontSize: 13,
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.4)
-            : const Color(0xFF64748B),
-      ),
-      filled: true,
-      fillColor: isDark
-          ? Colors.white.withValues(alpha: 0.06)
-          : Colors.black.withValues(alpha: 0.03),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.1)
-              : Colors.black.withValues(alpha: 0.1),
-        ),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.1)
-              : Colors.black.withValues(alpha: 0.1),
-        ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: _kCyan, width: 1.5),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFEF4444)),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFEF4444), width: 1.5),
-      ),
-      prefixIcon: icon != null
-          ? Icon(
-              icon,
-              size: 18,
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.35)
-                  : Colors.black.withValues(alpha: 0.3),
-            )
-          : null,
-      suffixText: suffix,
-      suffixStyle: TextStyle(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.45)
-            : Colors.black.withValues(alpha: 0.4),
-        fontSize: 14,
-      ),
-    );
-  }
-
-  TextStyle _inputStyle(bool isDark) => TextStyle(
-        fontSize: 14,
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.9)
-            : const Color(0xFF1E293B),
-      );
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -279,7 +200,7 @@ class _AddCarScreenState extends ConsumerState<AddCarScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 100),
           children: [
             // ── Photo ─────────────────────────────────────────────
             _PhotoPicker(
@@ -288,7 +209,7 @@ class _AddCarScreenState extends ConsumerState<AddCarScreen> {
               isDark: isDark,
               l10n: l10n,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
             // ── Basic info ────────────────────────────────────────
             _SectionCard(
@@ -299,28 +220,22 @@ class _AddCarScreenState extends ConsumerState<AddCarScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: TextFormField(
+                        child: _Input(
                           controller: _brandCtrl,
-                          style: _inputStyle(isDark),
-                          decoration: _dec(
-                            l10n.carBrand,
-                            icon: Icons.directions_car_rounded,
-                            isDark: isDark,
-                          ),
+                          label: l10n.carBrand,
+                          icon: Icons.directions_car_rounded,
+                          isDark: isDark,
                           validator: (v) => v?.trim().isEmpty == true
                               ? l10n.requiredField
                               : null,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
-                        child: TextFormField(
+                        child: _Input(
                           controller: _modelCtrl,
-                          style: _inputStyle(isDark),
-                          decoration: _dec(
-                            l10n.carModel,
-                            isDark: isDark,
-                          ),
+                          label: l10n.carModel,
+                          isDark: isDark,
                           validator: (v) => v?.trim().isEmpty == true
                               ? l10n.requiredField
                               : null,
@@ -328,42 +243,34 @@ class _AddCarScreenState extends ConsumerState<AddCarScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
                       Expanded(
-                        child: TextFormField(
+                        child: _Input(
                           controller: _yearCtrl,
-                          style: _inputStyle(isDark),
-                          decoration: _dec(
-                            l10n.carYear,
-                            icon: Icons.calendar_month_rounded,
-                            isDark: isDark,
-                          ),
+                          label: l10n.carYear,
+                          icon: Icons.calendar_month_rounded,
                           keyboardType: TextInputType.number,
+                          isDark: isDark,
                           validator: (v) {
                             final y = int.tryParse(v ?? '');
-                            if (y == null ||
-                                y < 1900 ||
-                                y > DateTime.now().year + 1) {
+                            if (y == null || y < 1900 || y > DateTime.now().year + 1) {
                               return l10n.invalidYear;
                             }
                             return null;
                           },
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
-                        child: TextFormField(
+                        child: _Input(
                           controller: _mileageCtrl,
-                          style: _inputStyle(isDark),
-                          decoration: _dec(
-                            l10n.carMileageField,
-                            icon: Icons.speed_rounded,
-                            isDark: isDark,
-                            suffix: l10n.kmSuffix,
-                          ),
+                          label: l10n.carMileageField,
+                          icon: Icons.speed_rounded,
+                          suffix: l10n.kmSuffix,
                           keyboardType: TextInputType.number,
+                          isDark: isDark,
                           validator: (v) => int.tryParse(v ?? '') == null
                               ? l10n.enterNumber
                               : null,
@@ -374,7 +281,7 @@ class _AddCarScreenState extends ConsumerState<AddCarScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
             // ── Technical ─────────────────────────────────────────
             _SectionCard(
@@ -384,48 +291,42 @@ class _AddCarScreenState extends ConsumerState<AddCarScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _FieldLabel(l10n.carFuelType, isDark: isDark),
-                  const SizedBox(height: 8),
+                  _Label(l10n.carFuelType, isDark: isDark),
+                  const SizedBox(height: 6),
                   _FuelSelector(
                     selected: _fuelType,
                     onSelect: (k) => setState(() => _fuelType = k),
                     isDark: isDark,
                     l10n: l10n,
                   ),
-                  const SizedBox(height: 14),
-                  _FieldLabel(l10n.carTransmission, isDark: isDark),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
+                  _Label(l10n.carTransmission, isDark: isDark),
+                  const SizedBox(height: 6),
                   _TransmissionSelector(
                     selected: _transmission,
                     onSelect: (k) => setState(() => _transmission = k),
                     isDark: isDark,
                     l10n: l10n,
                   ),
-                  const SizedBox(height: 14),
-                  TextFormField(
+                  const SizedBox(height: 12),
+                  _Input(
                     controller: _vinCtrl,
-                    style: _inputStyle(isDark),
-                    decoration: _dec(
-                      l10n.carVinOptional,
-                      icon: Icons.fingerprint_rounded,
-                      isDark: isDark,
-                    ),
+                    label: l10n.carVinOptional,
+                    icon: Icons.fingerprint_rounded,
+                    isDark: isDark,
                     textCapitalization: TextCapitalization.characters,
                   ),
-                  const SizedBox(height: 12),
-                  TextFormField(
+                  const SizedBox(height: 10),
+                  _Input(
                     controller: _colorCtrl,
-                    style: _inputStyle(isDark),
-                    decoration: _dec(
-                      l10n.carColorOpt,
-                      icon: Icons.palette_rounded,
-                      isDark: isDark,
-                    ),
+                    label: l10n.carColorOpt,
+                    icon: Icons.palette_rounded,
+                    isDark: isDark,
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
             // ── Tint ──────────────────────────────────────────────
             _SectionCard(
@@ -449,59 +350,47 @@ class _AddCarScreenState extends ConsumerState<AddCarScreen> {
                     child: _hasTint
                         ? Column(
                             children: [
-                              const SizedBox(height: 12),
-                              TextFormField(
-                                controller: _tintCtrl,
-                                style: _inputStyle(isDark),
-                                decoration: _dec(
-                                  l10n.carTintPercent,
-                                  icon: Icons.filter_rounded,
-                                  isDark: isDark,
-                                  suffix: '%',
-                                ),
-                                keyboardType: TextInputType.number,
-                                validator: (v) {
-                                  if (!_hasTint) return null;
-                                  final p = int.tryParse(v ?? '');
-                                  if (p == null || p < 0 || p > 100) {
-                                    return l10n.enter0100;
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 12),
-                              GestureDetector(
-                                onTap: _pickTintDate,
-                                child: AbsorbPointer(
-                                  child: TextFormField(
-                                    style: _inputStyle(isDark),
-                                    controller: TextEditingController(
-                                      text: _tintDate != null
-                                          ? AppDateUtils.format(_tintDate!)
-                                          : '',
-                                    ),
-                                    decoration: _dec(
-                                      l10n.carTintDate,
-                                      icon: Icons.calendar_today_rounded,
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _Input(
+                                      controller: _tintCtrl,
+                                      label: l10n.carTintPercent,
+                                      icon: Icons.filter_rounded,
+                                      suffix: '%',
+                                      keyboardType: TextInputType.number,
                                       isDark: isDark,
-                                    ).copyWith(
-                                      hintText: l10n.notSpecified,
-                                      hintStyle: TextStyle(
-                                        color: isDark
-                                            ? Colors.white.withValues(alpha: 0.25)
-                                            : Colors.black.withValues(alpha: 0.2),
-                                        fontSize: 14,
-                                      ),
-                                      suffixIcon: Icon(
-                                        Icons.expand_more_rounded,
-                                        size: 20,
-                                        color: isDark
-                                            ? Colors.white.withValues(alpha: 0.35)
-                                            : Colors.black.withValues(alpha: 0.3),
+                                      validator: (v) {
+                                        if (!_hasTint) return null;
+                                        final p = int.tryParse(v ?? '');
+                                        if (p == null || p < 0 || p > 100) {
+                                          return l10n.enter0100;
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: _pickTintDate,
+                                      child: AbsorbPointer(
+                                        child: _Input(
+                                          controller: TextEditingController(
+                                            text: _tintDate != null
+                                                ? AppDateUtils.format(_tintDate!)
+                                                : '',
+                                          ),
+                                          label: l10n.carTintDate,
+                                          icon: Icons.calendar_today_rounded,
+                                          isDark: isDark,
+                                          suffixIcon: Icons.expand_more_rounded,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
                             ],
                           )
@@ -510,8 +399,9 @@ class _AddCarScreenState extends ConsumerState<AddCarScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
+            // ── Save ──────────────────────────────────────────────
             _SaveButton(isLoading: _isLoading, onTap: _save, l10n: l10n),
           ],
         ),
@@ -526,62 +416,58 @@ class _FormAppBar extends StatelessWidget implements PreferredSizeWidget {
   const _FormAppBar({required this.title});
 
   @override
-  Size get preferredSize => const Size.fromHeight(64);
+  Size get preferredSize => const Size.fromHeight(56);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF0A2444), _kPrimary],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [Color(0xFF070C14), Color(0xFF0D1B2E), Color(0xFF185FA5)],
+          stops: [0.0, 0.5, 1.0],
         ),
       ),
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
           child: Row(
             children: [
               GestureDetector(
                 onTap: () => Navigator.of(context).pop(),
-                child: ClipOval(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                    child: Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.black.withValues(alpha: 0.25),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.18),
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        size: 17,
-                        color: Colors.white,
-                      ),
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.black.withValues(alpha: 0.25),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.15),
                     ),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    size: 15,
+                    color: Colors.white,
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               ClipRRect(
                 borderRadius: BorderRadius.circular(6),
                 child: Image.asset(
                   'assets/images/logo.png',
-                  width: 28,
-                  height: 28,
+                  width: 24,
+                  height: 24,
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 15,
+                  fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                   letterSpacing: 0.2,
@@ -595,7 +481,7 @@ class _FormAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-// ─── Section card ─────────────────────────────────────────────────────────────
+// ─── Section Card ─────────────────────────────────────────────────────────────
 class _SectionCard extends StatelessWidget {
   final String title;
   final Widget child;
@@ -613,18 +499,18 @@ class _SectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final accent = accentColor ?? _kCyan;
     return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           decoration: BoxDecoration(
             color: isDark
-                ? Colors.white.withValues(alpha: 0.05)
+                ? Colors.white.withValues(alpha: 0.04)
                 : Colors.white.withValues(alpha: 0.82),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isDark
-                  ? Colors.white.withValues(alpha: 0.08)
+                  ? Colors.white.withValues(alpha: 0.06)
                   : Colors.white.withValues(alpha: 0.9),
             ),
           ),
@@ -632,35 +518,33 @@ class _SectionCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(20)),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                   gradient: LinearGradient(colors: [
-                    accent.withValues(alpha: 0.14),
-                    accent.withValues(alpha: 0.04),
+                    accent.withValues(alpha: 0.12),
+                    accent.withValues(alpha: 0.03),
                   ]),
                 ),
                 child: Row(
                   children: [
                     Container(
-                      width: 4,
-                      height: 16,
+                      width: 3,
+                      height: 12,
                       decoration: BoxDecoration(
                         color: accent,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 8),
                     Text(
                       title,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 12,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.2,
                         color: isDark
-                            ? Colors.white.withValues(alpha: 0.9)
+                            ? Colors.white.withValues(alpha: 0.85)
                             : const Color(0xFF1E293B),
                       ),
                     ),
@@ -668,7 +552,7 @@ class _SectionCard extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
                 child: child,
               ),
             ],
@@ -679,7 +563,7 @@ class _SectionCard extends StatelessWidget {
   }
 }
 
-// ─── Photo picker ─────────────────────────────────────────────────────────────
+// ─── Photo Picker ─────────────────────────────────────────────────────────────
 class _PhotoPicker extends StatelessWidget {
   final String? path;
   final VoidCallback onTap;
@@ -697,13 +581,18 @@ class _PhotoPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          height: 200,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+      child: Container(
+        height: 140,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.06)
+                : Colors.black.withValues(alpha: 0.06),
           ),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(15),
           child: path != null
               ? Stack(
                   fit: StackFit.expand,
@@ -711,9 +600,8 @@ class _PhotoPicker extends StatelessWidget {
                     Image.file(
                       File(path!),
                       fit: BoxFit.cover,
-                      errorBuilder: (ctx, err, st) => _placeholder(),
+                      errorBuilder: (_, __, ___) => _placeholder(),
                     ),
-                    // Gradient overlay
                     Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
@@ -721,34 +609,45 @@ class _PhotoPicker extends StatelessWidget {
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.transparent,
-                            Colors.black.withValues(alpha: 0.5),
+                            Colors.black.withValues(alpha: 0.45),
                           ],
                         ),
                       ),
                     ),
-                    // Edit badge
                     Positioned(
-                      bottom: 12,
-                      right: 12,
+                      bottom: 10,
+                      right: 10,
                       child: ClipOval(
                         child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
                           child: Container(
-                            width: 38,
-                            height: 38,
+                            width: 32,
+                            height: 32,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.black.withValues(alpha: 0.4),
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.3),
+                                color: Colors.white.withValues(alpha: 0.25),
                               ),
                             ),
                             child: const Icon(
                               Icons.edit_rounded,
-                              size: 18,
+                              size: 14,
                               color: Colors.white,
                             ),
                           ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 12,
+                      left: 12,
+                      child: Text(
+                        l10n.photoTapToSelect,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.7),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -767,65 +666,49 @@ class _PhotoPicker extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [
-                  const Color(0xFF0A2444),
-                  const Color(0xFF111827),
-                ]
-              : [
-                  const Color(0xFFE2E8F0),
-                  const Color(0xFFCBD5E1),
-                ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.07)
-              : Colors.black.withValues(alpha: 0.07),
+              ? [const Color(0xFF0D1B2E), const Color(0xFF0A0A0F)]
+              : [const Color(0xFFE2E8F0), const Color(0xFFCBD5E1)],
         ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 68,
-            height: 68,
+            width: 52,
+            height: 52,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isDark
-                  ? _kPrimary.withValues(alpha: 0.18)
-                  : _kPrimary.withValues(alpha: 0.1),
+              color: _kPrimary.withValues(alpha: 0.12),
               border: Border.all(
-                color: isDark
-                    ? _kPriLight.withValues(alpha: 0.3)
-                    : _kPrimary.withValues(alpha: 0.2),
+                color: _kPrimary.withValues(alpha: 0.2),
               ),
             ),
             child: Icon(
               Icons.add_a_photo_rounded,
-              size: 30,
+              size: 24,
               color: isDark
-                  ? Colors.white.withValues(alpha: 0.6)
-                  : _kPrimary.withValues(alpha: 0.6),
+                  ? Colors.white.withValues(alpha: 0.5)
+                  : _kPrimary.withValues(alpha: 0.5),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Text(
             l10n.photoAddCar,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
               color: isDark
-                  ? Colors.white.withValues(alpha: 0.7)
+                  ? Colors.white.withValues(alpha: 0.65)
                   : const Color(0xFF334155),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             l10n.photoTapToSelect,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 11,
               color: isDark
-                  ? Colors.white.withValues(alpha: 0.35)
+                  ? Colors.white.withValues(alpha: 0.28)
                   : const Color(0xFF64748B),
             ),
           ),
@@ -835,7 +718,138 @@ class _PhotoPicker extends StatelessWidget {
   }
 }
 
-// ─── Fuel selector ────────────────────────────────────────────────────────────
+// ─── Input ────────────────────────────────────────────────────────────────────
+class _Input extends StatelessWidget {
+  final TextEditingController controller;
+  final String label;
+  final IconData? icon;
+  final String? suffix;
+  final IconData? suffixIcon;
+  final TextInputType? keyboardType;
+  final bool isDark;
+  final String? Function(String?)? validator;
+  final TextCapitalization textCapitalization;
+
+  const _Input({
+    required this.controller,
+    required this.label,
+    this.icon,
+    this.suffix,
+    this.suffixIcon,
+    this.keyboardType,
+    required this.isDark,
+    this.validator,
+    this.textCapitalization = TextCapitalization.none,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      textCapitalization: textCapitalization,
+      validator: validator,
+      style: TextStyle(
+        fontSize: 13,
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.9)
+            : const Color(0xFF1E293B),
+      ),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(
+          fontSize: 11,
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.35)
+              : const Color(0xFF64748B),
+        ),
+        filled: true,
+        fillColor: isDark
+            ? Colors.white.withValues(alpha: 0.05)
+            : Colors.black.withValues(alpha: 0.03),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.black.withValues(alpha: 0.08),
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.black.withValues(alpha: 0.08),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: _kCyan, width: 1.5),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFFEF4444)),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFFEF4444), width: 1.5),
+        ),
+        prefixIcon: icon != null
+            ? Icon(
+                icon,
+                size: 15,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.3)
+                    : Colors.black.withValues(alpha: 0.25),
+              )
+            : null,
+        suffixText: suffix,
+        suffixStyle: TextStyle(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.4)
+              : Colors.black.withValues(alpha: 0.35),
+          fontSize: 12,
+        ),
+        suffixIcon: suffixIcon != null
+            ? Icon(
+                suffixIcon,
+                size: 16,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.3)
+                    : Colors.black.withValues(alpha: 0.25),
+              )
+            : null,
+      ),
+    );
+  }
+}
+
+// ─── Label ────────────────────────────────────────────────────────────────────
+class _Label extends StatelessWidget {
+  final String text;
+  final bool isDark;
+
+  const _Label(this.text, {required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.2,
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.45)
+            : const Color(0xFF64748B),
+      ),
+    );
+  }
+}
+
+// ─── Fuel Selector ────────────────────────────────────────────────────────────
 class _FuelSelector extends StatelessWidget {
   final String selected;
   final ValueChanged<String> onSelect;
@@ -854,9 +868,9 @@ class _FuelSelector extends StatelessWidget {
     final entries = l10n.fuelTypeLabels.entries.toList();
     return Column(
       children: [
-        Row(children: entries.sublist(0, 2).map((e) => _item(e)).toList()),
-        const SizedBox(height: 8),
-        Row(children: entries.sublist(2).map((e) => _item(e)).toList()),
+        Row(children: entries.sublist(0, 2).map(_item).toList()),
+        const SizedBox(height: 6),
+        Row(children: entries.sublist(2).map(_item).toList()),
       ],
     );
   }
@@ -866,33 +880,31 @@ class _FuelSelector extends StatelessWidget {
     final color = _fuelColor(e.key);
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 3),
         child: GestureDetector(
           onTap: () => onSelect(e.key),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
               gradient: isSelected
-                  ? LinearGradient(
-                      colors: [
-                        color.withValues(alpha: 0.28),
-                        color.withValues(alpha: 0.12),
-                      ],
-                    )
+                  ? LinearGradient(colors: [
+                      color.withValues(alpha: 0.22),
+                      color.withValues(alpha: 0.08),
+                    ])
                   : null,
               color: isSelected
                   ? null
                   : (isDark
-                      ? Colors.white.withValues(alpha: 0.05)
-                      : Colors.black.withValues(alpha: 0.04)),
+                      ? Colors.white.withValues(alpha: 0.04)
+                      : Colors.black.withValues(alpha: 0.03)),
               border: Border.all(
                 color: isSelected
-                    ? color.withValues(alpha: 0.6)
+                    ? color.withValues(alpha: 0.5)
                     : (isDark
-                        ? Colors.white.withValues(alpha: 0.08)
-                        : Colors.black.withValues(alpha: 0.08)),
+                        ? Colors.white.withValues(alpha: 0.06)
+                        : Colors.black.withValues(alpha: 0.06)),
                 width: isSelected ? 1.5 : 1,
               ),
             ),
@@ -900,27 +912,25 @@ class _FuelSelector extends StatelessWidget {
               children: [
                 Icon(
                   _fuelIcon(e.key),
-                  size: 20,
+                  size: 16,
                   color: isSelected
                       ? color
                       : (isDark
-                          ? Colors.white.withValues(alpha: 0.4)
-                          : Colors.black.withValues(alpha: 0.3)),
+                          ? Colors.white.withValues(alpha: 0.35)
+                          : Colors.black.withValues(alpha: 0.25)),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 3),
                 Text(
                   e.value,
                   style: TextStyle(
-                    fontSize: 11,
-                    fontWeight:
-                        isSelected ? FontWeight.w700 : FontWeight.w400,
+                    fontSize: 10,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                     color: isSelected
                         ? color
                         : (isDark
                             ? Colors.white.withValues(alpha: 0.4)
                             : Colors.black.withValues(alpha: 0.3)),
                   ),
-                  textAlign: TextAlign.center,
                 ),
               ],
             ),
@@ -931,7 +941,7 @@ class _FuelSelector extends StatelessWidget {
   }
 }
 
-// ─── Transmission selector ────────────────────────────────────────────────────
+// ─── Transmission Selector ────────────────────────────────────────────────────
 class _TransmissionSelector extends StatelessWidget {
   final String selected;
   final ValueChanged<String> onSelect;
@@ -955,38 +965,36 @@ class _TransmissionSelector extends StatelessWidget {
             : Icons.tune_rounded;
         return Expanded(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 3),
             child: GestureDetector(
               onTap: () => onSelect(e.key),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(vertical: 9),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                   gradient: isSelected
-                      ? const LinearGradient(
-                          colors: [_kPriLight, _kPrimary],
-                        )
+                      ? const LinearGradient(colors: [_kPriLight, _kPrimary])
                       : null,
                   color: isSelected
                       ? null
                       : (isDark
-                          ? Colors.white.withValues(alpha: 0.05)
-                          : Colors.black.withValues(alpha: 0.04)),
+                          ? Colors.white.withValues(alpha: 0.04)
+                          : Colors.black.withValues(alpha: 0.03)),
                   border: Border.all(
                     color: isSelected
-                        ? _kPriLight.withValues(alpha: 0.7)
+                        ? _kPriLight.withValues(alpha: 0.6)
                         : (isDark
-                            ? Colors.white.withValues(alpha: 0.08)
-                            : Colors.black.withValues(alpha: 0.08)),
+                            ? Colors.white.withValues(alpha: 0.06)
+                            : Colors.black.withValues(alpha: 0.06)),
                     width: isSelected ? 1.5 : 1,
                   ),
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: _kPrimary.withValues(alpha: 0.35),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+                            color: _kPrimary.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
                           ),
                         ]
                       : [],
@@ -996,21 +1004,19 @@ class _TransmissionSelector extends StatelessWidget {
                   children: [
                     Icon(
                       icon,
-                      size: 18,
+                      size: 14,
                       color: isSelected
                           ? Colors.white
                           : (isDark
-                              ? Colors.white.withValues(alpha: 0.4)
-                              : Colors.black.withValues(alpha: 0.3)),
+                              ? Colors.white.withValues(alpha: 0.35)
+                              : Colors.black.withValues(alpha: 0.25)),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 5),
                     Text(
                       e.value,
                       style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: isSelected
-                            ? FontWeight.w700
-                            : FontWeight.w400,
+                        fontSize: 12,
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                         color: isSelected
                             ? Colors.white
                             : (isDark
@@ -1029,7 +1035,7 @@ class _TransmissionSelector extends StatelessWidget {
   }
 }
 
-// ─── Tint toggle ──────────────────────────────────────────────────────────────
+// ─── Tint Toggle ──────────────────────────────────────────────────────────────
 class _TintToggle extends StatelessWidget {
   final bool value;
   final bool isDark;
@@ -1049,19 +1055,19 @@ class _TintToggle extends StatelessWidget {
       children: [
         Icon(
           Icons.filter_rounded,
-          size: 18,
+          size: 15,
           color: value
               ? const Color(0xFF8B5CF6)
               : (isDark
-                  ? Colors.white.withValues(alpha: 0.4)
-                  : Colors.black.withValues(alpha: 0.3)),
+                  ? Colors.white.withValues(alpha: 0.35)
+                  : Colors.black.withValues(alpha: 0.25)),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 8),
         Expanded(
           child: Text(
             l10n.carHasTint,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: value ? FontWeight.w600 : FontWeight.w400,
               color: isDark
                   ? Colors.white.withValues(alpha: 0.8)
@@ -1074,36 +1080,14 @@ class _TintToggle extends StatelessWidget {
           onChanged: onChanged,
           activeThumbColor: const Color(0xFF8B5CF6),
           activeTrackColor: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
       ],
     );
   }
 }
 
-// ─── Field label ──────────────────────────────────────────────────────────────
-class _FieldLabel extends StatelessWidget {
-  final String text;
-  final bool isDark;
-
-  const _FieldLabel(this.text, {required this.isDark});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 0.3,
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.5)
-            : const Color(0xFF64748B),
-      ),
-    );
-  }
-}
-
-// ─── Sheet tile ───────────────────────────────────────────────────────────────
+// ─── Sheet Tile ───────────────────────────────────────────────────────────────
 class _SheetTile extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -1124,33 +1108,34 @@ class _SheetTile extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: ListTile(
-      leading: Container(
-        width: 38,
-        height: 38,
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(10),
+        dense: true,
+        leading: Container(
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, size: 18, color: color),
         ),
-        child: Icon(icon, size: 20, color: color),
-      ),
-      title: Text(
-        label,
-        style: TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w500,
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.9)
-              : const Color(0xFF1E293B),
+        title: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.9)
+                : const Color(0xFF1E293B),
+          ),
         ),
+        onTap: onTap,
       ),
-      onTap: onTap,
-    ),
     );
   }
 }
 
-// ─── Save button ──────────────────────────────────────────────────────────────
-class _SaveButton extends StatelessWidget {
+// ─── Save Button ──────────────────────────────────────────────────────────────
+class _SaveButton extends StatefulWidget {
   final bool isLoading;
   final VoidCallback onTap;
   final AppLocalizations l10n;
@@ -1158,48 +1143,63 @@ class _SaveButton extends StatelessWidget {
   const _SaveButton({required this.isLoading, required this.onTap, required this.l10n});
 
   @override
+  State<_SaveButton> createState() => _SaveButtonState();
+}
+
+class _SaveButtonState extends State<_SaveButton> {
+  bool _pressed = false;
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: isLoading ? null : onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        height: 54,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(27),
-          gradient: LinearGradient(
-            colors: isLoading
-                ? [Colors.grey.shade700, Colors.grey.shade600]
-                : [_kPriLight, _kPrimary],
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.96 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        child: Container(
+          height: 46,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            gradient: LinearGradient(
+              colors: widget.isLoading
+                  ? [Colors.grey.shade700, Colors.grey.shade600]
+                  : [_kPriLight, _kPrimary],
+            ),
+            boxShadow: widget.isLoading
+                ? []
+                : [
+                    BoxShadow(
+                      color: _kPrimary.withValues(alpha: 0.4),
+                      blurRadius: 14,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
           ),
-          boxShadow: isLoading
-              ? []
-              : [
-                  BoxShadow(
-                    color: _kPrimary.withValues(alpha: 0.45),
-                    blurRadius: 18,
-                    offset: const Offset(0, 6),
+          child: Center(
+            child: widget.isLoading
+                ? const SizedBox(
+                    height: 18,
+                    width: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : Text(
+                    widget.l10n.save,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      letterSpacing: 0.3,
+                    ),
                   ),
-                ],
-        ),
-        child: Center(
-          child: isLoading
-              ? const SizedBox(
-                  height: 22,
-                  width: 22,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
-              : Text(
-                  l10n.save,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    letterSpacing: 0.4,
-                  ),
-                ),
+          ),
         ),
       ),
     );

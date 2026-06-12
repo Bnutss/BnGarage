@@ -1,11 +1,14 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/utils/date_utils.dart';
 import '../../../../core/utils/mileage_utils.dart';
 import '../../data/models/service_record_model.dart';
+import '../providers/service_records_provider.dart';
 
 const _kPrimary = Color(0xFF185FA5);
 const _kPriLight = Color(0xFF2E86D4);
@@ -27,16 +30,16 @@ Color _catColor(String key) {
 }
 
 // ─── Main screen ─────────────────────────────────────────────────────────────
-class RecordDetailScreen extends StatefulWidget {
+class RecordDetailScreen extends ConsumerStatefulWidget {
   final ServiceRecordModel record;
 
   const RecordDetailScreen({super.key, required this.record});
 
   @override
-  State<RecordDetailScreen> createState() => _RecordDetailScreenState();
+  ConsumerState<RecordDetailScreen> createState() => _RecordDetailScreenState();
 }
 
-class _RecordDetailScreenState extends State<RecordDetailScreen>
+class _RecordDetailScreenState extends ConsumerState<RecordDetailScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
   late final Animation<double> _fade;
@@ -76,7 +79,13 @@ class _RecordDetailScreenState extends State<RecordDetailScreen>
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          _HeroAppBar(record: record, cat: cat, accent: accent, isDark: isDark),
+          _HeroAppBar(
+            record: record,
+            cat: cat,
+            accent: accent,
+            isDark: isDark,
+            onDelete: () => _confirmDelete(context),
+          ),
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
             sliver: SliverList(
@@ -144,6 +153,154 @@ class _RecordDetailScreenState extends State<RecordDetailScreen>
       ),
     );
   }
+
+  void _confirmDelete(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = context.l10n;
+    final record = widget.record;
+
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : Colors.white.withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.white.withValues(alpha: 0.8),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEF4444).withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.delete_outline,
+                          color: Color(0xFFEF4444),
+                          size: 16,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        l10n.delete,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF0F172A),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    record.title,
+                    style: TextStyle(
+                      fontSize: 13,
+                      height: 1.5,
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.55)
+                          : Colors.black.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => Navigator.pop(ctx),
+                          child: Container(
+                            height: 38,
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.06)
+                                  : Colors.black.withValues(alpha: 0.04),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              l10n.cancel,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: isDark
+                                    ? Colors.white
+                                    : const Color(0xFF0F172A),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                          child: GestureDetector(
+                            onTap: () async {
+                              Navigator.pop(ctx);
+                              final carId = GoRouterState.of(context)
+                                  .pathParameters['carId']!;
+                              await ref
+                                  .read(serviceRecordRepositoryProvider)
+                                  .deleteRecord(record.id);
+                              ref.invalidate(
+                                serviceRecordsProvider(carId),
+                              );
+                              if (context.mounted) context.pop();
+                            },
+                          child: Container(
+                            height: 38,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEF4444),
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFFEF4444).withValues(alpha: 0.3),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              l10n.delete,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 // ─── Hero SliverAppBar ────────────────────────────────────────────────────────
@@ -152,12 +309,14 @@ class _HeroAppBar extends StatelessWidget {
   final ServiceCategory cat;
   final Color accent;
   final bool isDark;
+  final VoidCallback onDelete;
 
   const _HeroAppBar({
     required this.record,
     required this.cat,
     required this.accent,
     required this.isDark,
+    required this.onDelete,
   });
 
   @override
@@ -174,6 +333,15 @@ class _HeroAppBar extends StatelessWidget {
           onTap: () => Navigator.of(context).pop(),
         ),
       ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: _CircleBtn(
+            icon: Icons.delete_outline_rounded,
+            onTap: onDelete,
+          ),
+        ),
+      ],
       flexibleSpace: FlexibleSpaceBar(
         stretchModes: const [StretchMode.zoomBackground],
         titlePadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),

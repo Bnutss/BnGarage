@@ -7,7 +7,7 @@ import '../../../../core/providers/theme_provider.dart';
 
 const _kPrimary    = Color(0xFF185FA5);
 const _kPriLight   = Color(0xFF2E86D4);
-const _kDarkBg     = Color(0xFF0A0F1A);
+const _kDarkBg     = Color(0xFF000000);
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});

@@ -11,8 +11,8 @@ import '../providers/reminders_provider.dart';
 
 // ─── Palette ─────────────────────────────────────────────────────────────────
 const _kPrimary  = Color(0xFF185FA5);
-const _kDarkBg   = Color(0xFF0A0F1A);
-const _kSurface  = Color(0xFF111827);
+const _kDarkBg   = Color(0xFF000000);
+const _kSurface  = Color(0xFF0A0A0F);
 const _kOverdue  = Color(0xFFEF4444);
 const _kSoon     = Color(0xFFF59E0B);
 const _kOk       = Color(0xFF10B981);

@@ -13,7 +13,7 @@ import '../providers/cars_provider.dart';
 const _kPrimary  = Color(0xFF185FA5);
 const _kPriLight = Color(0xFF2E86D4);
 const _kCyan     = Color(0xFF22D3EE);
-const _kDarkBg   = Color(0xFF0A0F1A);
+const _kDarkBg   = Color(0xFF000000);
 
 IconData _fuelIcon(String key) => switch (key) {
   'gasoline' => Icons.local_gas_station_rounded,

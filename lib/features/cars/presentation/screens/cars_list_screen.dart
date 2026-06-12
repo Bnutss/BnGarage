@@ -13,8 +13,8 @@ const _kPrimary = Color(0xFF185FA5);
 const _kPriLight = Color(0xFF2E86D4);
 const _kCyan = Color(0xFF22D3EE);
 const _kAccentDeep = Color(0xFF0A2444);
-const _kDarkBg = Color(0xFF0A0F1A);
-const _kSurface = Color(0xFF111827);
+const _kDarkBg = Color(0xFF000000);
+const _kSurface = Color(0xFF0A0A0F);
 const _kOverdue = Color(0xFFEF4444);
 const _kSoon = Color(0xFFF59E0B);
 

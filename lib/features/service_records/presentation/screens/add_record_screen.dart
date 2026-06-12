@@ -13,7 +13,7 @@ import '../providers/service_records_provider.dart';
 const _kPrimary  = Color(0xFF185FA5);
 const _kPriLight = Color(0xFF2E86D4);
 const _kCyan     = Color(0xFF22D3EE);
-const _kDarkBg   = Color(0xFF0A0F1A);
+const _kDarkBg   = Color(0xFF000000);
 
 Color _catColor(String key) => switch (key) {
   'oil'          => const Color(0xFFF59E0B),

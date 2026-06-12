@@ -13,7 +13,7 @@ import '../providers/service_records_provider.dart';
 const _kPrimary = Color(0xFF185FA5);
 const _kPriLight = Color(0xFF2E86D4);
 const _kCyan = Color(0xFF22D3EE);
-const _kDarkBg = Color(0xFF0A0F1A);
+const _kDarkBg = Color(0xFF000000);
 
 Color _catColor(String key) => switch (key) {
   'oil' => const Color(0xFFF59E0B),
@@ -194,7 +194,7 @@ class _ServiceAppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 // ─── Category section ─────────────────────────────────────────────────────────
-class _CategorySection extends StatefulWidget {
+class _CategorySection extends ConsumerStatefulWidget {
   final ServiceCategory cat;
   final List<ServiceRecordModel> records;
   final CarModel car;
@@ -212,10 +212,10 @@ class _CategorySection extends StatefulWidget {
   });
 
   @override
-  State<_CategorySection> createState() => _CategorySectionState();
+  ConsumerState<_CategorySection> createState() => _CategorySectionState();
 }
 
-class _CategorySectionState extends State<_CategorySection>
+class _CategorySectionState extends ConsumerState<_CategorySection>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
   late final Animation<double> _fade;
@@ -336,14 +336,32 @@ class _CategorySectionState extends State<_CategorySection>
                                     ? Colors.white.withValues(alpha: 0.06)
                                     : Colors.black.withValues(alpha: 0.06),
                               ),
-                            _RecordRow(
-                              record: record,
-                              car: widget.car,
-                              color: color,
-                              isDark: widget.isDark,
-                              isFirst: i == 0,
-                              isLast: i == widget.records.length - 1,
-                              l10n: widget.l10n,
+                            Dismissible(
+                              key: ValueKey(record.id),
+                              direction: DismissDirection.endToStart,
+                              background: Container(
+                                alignment: Alignment.centerRight,
+                                padding: const EdgeInsets.only(right: 20),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEF4444).withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Icon(
+                                  Icons.delete_outline_rounded,
+                                  color: Color(0xFFEF4444),
+                                  size: 20,
+                                ),
+                              ),
+                              confirmDismiss: (_) => _confirmDelete(context, record),
+                              child: _RecordRow(
+                                record: record,
+                                car: widget.car,
+                                color: color,
+                                isDark: widget.isDark,
+                                isFirst: i == 0,
+                                isLast: i == widget.records.length - 1,
+                                l10n: widget.l10n,
+                              ),
                             ),
                           ],
                         );
@@ -357,6 +375,145 @@ class _CategorySectionState extends State<_CategorySection>
         ),
       ),
     );
+  }
+
+  Future<bool> _confirmDelete(
+    BuildContext context,
+    ServiceRecordModel record,
+  ) async {
+    final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(18),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+            child: Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : Colors.white.withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.white.withValues(alpha: 0.8),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEF4444).withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.delete_outline,
+                          color: Color(0xFFEF4444),
+                          size: 16,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        l10n.delete,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF0F172A),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    record.title,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.6)
+                          : Colors.black.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => Navigator.pop(ctx, false),
+                          child: Container(
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.06)
+                                  : Colors.black.withValues(alpha: 0.04),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              l10n.cancel,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: isDark
+                                    ? Colors.white
+                                    : const Color(0xFF0F172A),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => Navigator.pop(ctx, true),
+                          child: Container(
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEF4444),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              l10n.delete,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    if (result == true) {
+      await ref
+          .read(serviceRecordRepositoryProvider)
+          .deleteRecord(record.id);
+      ref.invalidate(serviceRecordsProvider(widget.car.id));
+      return true;
+    }
+    return false;
   }
 }
 
