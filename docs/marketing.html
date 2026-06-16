@@ -4,217 +4,1200 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BnGarage — Личный гараж в вашем кармане</title>
-  <meta name="description" content="BnGarage — приложение для учёта автомобилей, истории обслуживания и умных напоминаний о ТО." />
+  <meta name="description" content="BnGarage — приложение для учёта автомобилей, истории обслуживания и умных напоминаний о ТО. Бесплатно, работает офлайн." />
+  <meta property="og:title" content="BnGarage — Личный гараж в вашем кармане" />
+  <meta property="og:description" content="Учёт автомобилей, история ТО и умные напоминания. Бесплатно. iOS и Android." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900&display=swap" rel="stylesheet">
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #000;
-      color: #f5f5f7;
+    /* ── Reset ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #000000;
+      --bg-2:        #080808;
+      --card:        rgba(255,255,255,0.035);
+      --card-hover:  rgba(255,255,255,0.065);
+      --border:      rgba(255,255,255,0.08);
+      --border-2:    rgba(255,255,255,0.14);
+      --blue:        #185FA5;
+      --blue-2:      #2E86D4;
+      --cyan:        #22D3EE;
+      --white:       #FFFFFF;
+      --muted:       rgba(255,255,255,0.55);
+      --faint:       rgba(255,255,255,0.28);
+      --green:       #10B981;
+      --amber:       #F59E0B;
+      --red:         #EF4444;
+      --purple:      #8B5CF6;
+      --font:        'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* Hero */
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--white);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ── Ambient glow ──────────────────────────────────── */
+    .ambient {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .ambient-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+    }
+    .ambient-blob-1 {
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(24,95,165,.22) 0%, transparent 70%);
+      top: -250px; right: -180px;
+      animation: blob-drift 10s ease-in-out infinite;
+    }
+    .ambient-blob-2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(34,211,238,.1) 0%, transparent 70%);
+      bottom: 15%; left: -150px;
+      animation: blob-drift 14s ease-in-out infinite reverse;
+    }
+    .ambient-blob-3 {
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(46,134,212,.13) 0%, transparent 70%);
+      top: 55%; right: 8%;
+      animation: blob-drift 12s ease-in-out infinite;
+      animation-delay: -4s;
+    }
+    @keyframes blob-drift {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50%       { transform: translateY(-24px) scale(1.06); }
+    }
+
+    /* ── Layout ────────────────────────────────────────── */
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0;
+      margin: -1px; overflow: hidden; clip: rect(0,0,0,0);
+      white-space: nowrap; border-width: 0;
+    }
+
+    /* ── Nav ───────────────────────────────────────────── */
+    .nav {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      width: calc(100% - 32px);
+      max-width: 1120px;
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 18px;
+      background: rgba(4,4,4,.72);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      text-decoration: none;
+    }
+    .nav-logo-mark {
+      width: 30px; height: 30px;
+      background: linear-gradient(135deg, var(--blue-2), var(--blue));
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .nav-logo-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: .2px;
+    }
+    .nav-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, var(--blue-2), var(--blue));
+      color: white;
+      border-radius: 9px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: opacity .2s, transform .2s;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .nav-pill:hover { opacity: .85; transform: translateY(-1px); }
+
+    /* ── Hero ──────────────────────────────────────────── */
     .hero {
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 60px 20px;
-      background: linear-gradient(160deg, #1a1a2e 0%, #0f0f0f 60%, #0d1b2a 100%);
+      padding: 120px 0 90px;
+      position: relative;
+      z-index: 1;
     }
-    .hero-badge {
-      display: inline-block;
-      background: rgba(0,113,227,0.2);
-      color: #4da3ff;
-      border: 1px solid rgba(0,113,227,0.4);
-      border-radius: 20px;
-      padding: 6px 16px;
-      font-size: 0.85rem;
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+      align-items: center;
+    }
+
+    /* badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(34,211,238,.08);
+      color: var(--cyan);
+      border: 1px solid rgba(34,211,238,.22);
+      border-radius: 100px;
+      padding: 5px 13px 5px 8px;
+      font-size: 12.5px;
       font-weight: 500;
-      margin-bottom: 24px;
-      letter-spacing: 0.5px;
+      margin-bottom: 22px;
+      letter-spacing: .3px;
     }
+    .badge-dot {
+      width: 6px; height: 6px;
+      background: var(--cyan);
+      border-radius: 50%;
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .4; }
+    }
+
+    /* heading */
     .hero h1 {
-      font-size: clamp(2.5rem, 7vw, 5rem);
-      font-weight: 800;
-      line-height: 1.1;
-      margin-bottom: 20px;
-      background: linear-gradient(135deg, #fff 40%, #4da3ff);
+      font-size: clamp(2.6rem, 5vw, 3.8rem);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -1px;
+      margin-bottom: 18px;
+    }
+    .grad {
+      background: linear-gradient(135deg, #fff 25%, var(--cyan) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .hero p {
-      font-size: clamp(1rem, 2.5vw, 1.3rem);
-      color: #a1a1a6;
-      max-width: 560px;
-      line-height: 1.6;
-      margin-bottom: 40px;
+
+    .hero-p {
+      font-size: 1.05rem;
+      color: var(--muted);
+      line-height: 1.72;
+      margin-bottom: 38px;
+      max-width: 450px;
     }
-    .store-buttons { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+
+    /* store buttons */
+    .store-row {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      align-items: flex-start;
+    }
     .store-btn {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 14px 24px;
-      border-radius: 14px;
+      gap: 13px;
+      padding: 13px 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 13px;
       text-decoration: none;
-      font-size: 0.95rem;
-      font-weight: 600;
-      transition: transform 0.2s, opacity 0.2s;
+      transition: background .22s, border-color .22s, transform .22s;
+      cursor: pointer;
+      min-width: 210px;
     }
-    .store-btn:hover { transform: scale(1.03); opacity: 0.9; }
-    .store-btn.apple { background: #fff; color: #000; }
-    .store-btn.google { background: #0071e3; color: #fff; }
-    .store-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
+    .store-btn:hover {
+      background: var(--card-hover);
+      border-color: var(--border-2);
+      transform: translateY(-2px);
+    }
+    .store-btn img {
+      height: 26px;
+      width: auto;
+      flex-shrink: 0;
+    }
+    .store-btn-copy { display: flex; flex-direction: column; }
+    .store-btn-sub  { font-size: 11px; color: var(--faint); font-weight: 400; line-height: 1; }
+    .store-btn-name { font-size: 15.5px; font-weight: 700; color: var(--white); line-height: 1.3; }
 
-    /* Features */
-    .section {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 80px 20px;
+    /* ── Phone mockup ──────────────────────────────────── */
+    .phone-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
     }
-    .section-label {
+    .phone-glow {
+      position: absolute;
+      width: 340px; height: 340px;
+      background: radial-gradient(circle, rgba(24,95,165,.3) 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(50px);
+      animation: glow-pulse 3.5s ease-in-out infinite;
+    }
+    @keyframes glow-pulse {
+      0%, 100% { opacity: .65; transform: scale(1); }
+      50%       { opacity: 1; transform: scale(1.12); }
+    }
+    .phone {
+      position: relative;
+      width: 256px; height: 518px;
+      background: #080808;
+      border-radius: 42px;
+      border: 1.5px solid rgba(255,255,255,0.13);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.04),
+        0 40px 80px rgba(0,0,0,.75),
+        inset 0 1px 0 rgba(255,255,255,.07);
+      overflow: hidden;
+      animation: phone-float 4.5s ease-in-out infinite;
+    }
+    @keyframes phone-float {
+      0%, 100% { transform: translateY(0) rotate(-1.2deg); }
+      50%       { transform: translateY(-13px) rotate(1deg); }
+    }
+    .phone-pill {
+      position: absolute;
+      top: 13px; left: 50%;
+      transform: translateX(-50%);
+      width: 76px; height: 5px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      z-index: 10;
+    }
+    .phone-screen {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(165deg, #06101c 0%, #0c1a2e 55%, #132b47 100%);
+      overflow: hidden;
+    }
+
+    /* in-phone UI */
+    .ui-sb {
+      padding: 17px 16px 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .ui-sb-time { font-size: 10.5px; font-weight: 700; color: rgba(255,255,255,.88); }
+    .ui-header {
+      padding: 6px 14px 10px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .ui-logo {
+      width: 22px; height: 22px;
+      background: linear-gradient(135deg, #2E86D4, #185FA5);
+      border-radius: 5px;
+    }
+    .ui-title { font-size: 12.5px; font-weight: 800; color: white; }
+    .ui-badge {
+      margin-left: auto;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 10px;
+      padding: 2px 7px;
+      font-size: 7.5px;
+      color: rgba(255,255,255,.7);
+      font-weight: 500;
+    }
+    .ui-car {
+      margin: 10px 10px 0;
+      background: linear-gradient(135deg, #162e4a, #0d1928);
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.07);
+      padding: 13px 13px 0;
+    }
+    .ui-car-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 9px;
+    }
+    .ui-brand  { font-size: 7.5px; font-weight: 700; color: rgba(255,255,255,.35); letter-spacing: 1.8px; }
+    .ui-model  { font-size: 14px; font-weight: 900; color: white; line-height: 1.2; }
+    .ui-km     { font-size: 11.5px; font-weight: 700; color: white; text-align: right; }
+    .ui-year   { font-size: 7.5px; color: rgba(255,255,255,.3); text-align: right; }
+    .ui-chips  { display: flex; gap: 5px; margin-bottom: 12px; }
+    .ui-chip   {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 7px;
+      color: rgba(255,255,255,.6);
+    }
+    .ui-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(34,211,238,.35), transparent);
+    }
+    .ui-status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(239,68,68,.12);
+      border: 1px solid rgba(239,68,68,.3);
+      border-radius: 6px;
+      padding: 2px 6px;
+      margin: 8px 0 0;
+    }
+    .ui-status-dot  { width: 4px; height: 4px; border-radius: 50%; background: var(--red); }
+    .ui-status-text { font-size: 7px; color: var(--red); font-weight: 600; }
+    .ui-stats {
+      display: flex;
+      gap: 6px;
+      padding: 10px;
+    }
+    .ui-stat {
+      flex: 1;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 8px;
+      padding: 7px;
       text-align: center;
-      font-size: 0.85rem;
+    }
+    .ui-stat-v { font-size: 11px; font-weight: 700; color: white; }
+    .ui-stat-l { font-size: 6.5px; color: rgba(255,255,255,.3); margin-top: 1px; }
+    .ui-reminders { padding: 0 10px 10px; }
+    .ui-rem {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 8px;
+      border-radius: 8px;
+      margin-bottom: 5px;
+    }
+    .ui-rem-red  { background: rgba(239,68,68,.09); border: 1px solid rgba(239,68,68,.18); }
+    .ui-rem-grn  { background: rgba(16,185,129,.07); border: 1px solid rgba(16,185,129,.18); }
+    .ui-rem-dot  { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+    .ui-rem-text { font-size: 7.5px; color: rgba(255,255,255,.8); }
+    .ui-navbar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 54px;
+      background: rgba(3,3,3,.82);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(255,255,255,.07);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+    }
+    .ui-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 5px 14px;
+      border-radius: 18px;
+    }
+    .ui-tab-active { background: linear-gradient(135deg, #2E86D4, #185FA5); }
+    .ui-tab-bar { width: 15px; height: 2.5px; border-radius: 2px; background: rgba(255,255,255,.35); }
+    .ui-tab-bar-active { background: white; }
+    .ui-tab-lbl { font-size: 6px; color: rgba(255,255,255,.4); }
+    .ui-tab-lbl-active { color: white; }
+
+    /* ── Divider line ──────────────────────────────────── */
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Stats strip ───────────────────────────────────── */
+    .stats-strip {
+      padding: 70px 0;
+      position: relative;
+      z-index: 1;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .stat-cell {
+      background: var(--card);
+      padding: 40px 32px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+      transition: background .25s;
+    }
+    .stat-cell:last-child { border-right: none; }
+    .stat-cell:hover { background: var(--card-hover); }
+    .stat-num {
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, #fff 30%, var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 7px;
+    }
+    .stat-lbl {
+      font-size: 13.5px;
+      color: var(--faint);
+      line-height: 1.45;
+    }
+
+    /* ── Section header ────────────────────────────────── */
+    .sec-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
       font-weight: 600;
-      color: #4da3ff;
-      letter-spacing: 1px;
+      color: var(--cyan);
+      letter-spacing: 1.6px;
       text-transform: uppercase;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
-    .section-title {
-      text-align: center;
-      font-size: clamp(1.8rem, 4vw, 2.8rem);
-      font-weight: 700;
-      margin-bottom: 60px;
-      color: #f5f5f7;
+    .sec-h2 {
+      font-size: clamp(1.75rem, 3.5vw, 2.55rem);
+      font-weight: 800;
+      line-height: 1.14;
+      letter-spacing: -.4px;
+      margin-bottom: 14px;
+    }
+    .sec-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.72;
+      max-width: 460px;
+      margin-bottom: 52px;
+    }
+
+    /* ── Features ──────────────────────────────────────── */
+    .features-section {
+      padding: 80px 0;
+      position: relative;
+      z-index: 1;
     }
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
     }
-    .feature-card {
-      background: #111;
-      border: 1px solid #222;
-      border-radius: 20px;
-      padding: 28px;
-      transition: border-color 0.2s;
+    .feat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 26px 22px;
+      transition: background .25s, border-color .25s, transform .25s, box-shadow .25s;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
     }
-    .feature-card:hover { border-color: #333; }
-    .feature-icon {
-      font-size: 2rem;
-      margin-bottom: 16px;
+    .feat-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(46,134,212,.06) 0%, transparent 55%);
+      opacity: 0;
+      transition: opacity .3s;
+      border-radius: 18px;
     }
-    .feature-card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; color: #f5f5f7; }
-    .feature-card p { font-size: 0.9rem; color: #6e6e73; line-height: 1.6; }
+    .feat-card:hover {
+      background: var(--card-hover);
+      border-color: var(--border-2);
+      transform: translateY(-3px);
+      box-shadow: 0 18px 36px rgba(0,0,0,.45);
+    }
+    .feat-card:hover::after { opacity: 1; }
+    .feat-icon {
+      width: 46px; height: 46px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 18px;
+      flex-shrink: 0;
+    }
+    .feat-title { font-size: 15.5px; font-weight: 700; color: var(--white); margin-bottom: 7px; line-height: 1.3; }
+    .feat-desc  { font-size: 13.5px; color: var(--faint); line-height: 1.65; }
 
-    /* Privacy highlight */
+    /* ── How ───────────────────────────────────────────── */
+    .how-section {
+      padding: 80px 0;
+      position: relative;
+      z-index: 1;
+    }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 52px;
+    }
+    .step-card {
+      text-align: center;
+      padding: 32px 22px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      transition: background .25s, transform .25s;
+    }
+    .step-card:hover { background: var(--card-hover); transform: translateY(-3px); }
+    .step-num {
+      width: 46px; height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--blue-2), var(--blue));
+      display: grid;
+      place-items: center;
+      font-size: 19px;
+      font-weight: 900;
+      color: white;
+      margin: 0 auto 18px;
+      box-shadow: 0 8px 22px rgba(24,95,165,.38);
+    }
+    .step-title { font-size: 16px; font-weight: 700; margin-bottom: 9px; }
+    .step-desc  { font-size: 14px; color: var(--faint); line-height: 1.65; }
+
+    /* ── Privacy ───────────────────────────────────────── */
     .privacy-section {
-      background: #0d1b2a;
-      border-top: 1px solid #1a2a3a;
-      border-bottom: 1px solid #1a2a3a;
+      padding: 80px 0;
+      position: relative;
+      z-index: 1;
     }
-    .privacy-inner {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 80px 20px;
-      text-align: center;
+    .privacy-card {
+      background: linear-gradient(135deg, rgba(24,95,165,.1) 0%, rgba(34,211,238,.04) 100%);
+      border: 1px solid rgba(24,95,165,.28);
+      border-radius: 22px;
+      padding: 52px 44px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 44px;
+      align-items: center;
     }
-    .privacy-inner h2 { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 700; margin-bottom: 16px; }
-    .privacy-inner p { font-size: 1rem; color: #a1a1a6; line-height: 1.7; max-width: 560px; margin: 0 auto; }
+    .privacy-icon {
+      width: 76px; height: 76px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(24,95,165,.28), rgba(34,211,238,.1));
+      border: 1px solid rgba(34,211,238,.18);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .privacy-h2 { font-size: 1.55rem; font-weight: 800; margin-bottom: 10px; line-height: 1.2; }
+    .privacy-p  { font-size: 14.5px; color: var(--muted); line-height: 1.75; }
 
-    /* Footer */
-    footer {
-      text-align: center;
-      padding: 40px 20px;
-      font-size: 0.85rem;
-      color: #6e6e73;
-      border-top: 1px solid #1a1a1a;
+    /* ── CTA ───────────────────────────────────────────── */
+    .cta-section {
+      padding: 80px 0 100px;
+      position: relative;
+      z-index: 1;
     }
-    footer a { color: #4da3ff; text-decoration: none; margin: 0 10px; }
+    .cta-card {
+      background: linear-gradient(160deg, #0a1726 0%, #0f1f35 100%);
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      padding: 72px 44px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-card::before {
+      content: '';
+      position: absolute;
+      top: -80px; left: 50%;
+      transform: translateX(-50%);
+      width: 560px; height: 280px;
+      background: radial-gradient(ellipse, rgba(24,95,165,.22) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-h2 {
+      font-size: clamp(1.7rem, 3.5vw, 2.65rem);
+      font-weight: 900;
+      letter-spacing: -.4px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .cta-p {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.68;
+      max-width: 440px;
+      margin: 0 auto 46px;
+      position: relative;
+    }
+    .cta-btns {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: relative;
+    }
+    .cta-primary {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 15px 26px;
+      background: linear-gradient(135deg, var(--blue-2), var(--blue));
+      color: white;
+      border-radius: 13px;
+      text-decoration: none;
+      font-size: 14.5px;
+      font-weight: 700;
+      transition: opacity .22s, transform .22s, box-shadow .22s;
+      cursor: pointer;
+      box-shadow: 0 8px 22px rgba(24,95,165,.38);
+    }
+    .cta-primary:hover {
+      opacity: .9;
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(24,95,165,.52);
+    }
+    .cta-secondary {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 15px 26px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: white;
+      border-radius: 13px;
+      text-decoration: none;
+      font-size: 14.5px;
+      font-weight: 600;
+      transition: background .22s, border-color .22s, transform .22s;
+      cursor: pointer;
+    }
+    .cta-secondary:hover {
+      background: var(--card-hover);
+      border-color: var(--border-2);
+      transform: translateY(-2px);
+    }
+    .cta-primary img, .cta-secondary img { height: 22px; width: auto; }
+
+    /* ── Footer ────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 36px 0;
+      position: relative;
+      z-index: 1;
+    }
+    .foot-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+    .foot-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .foot-mark {
+      width: 26px; height: 26px;
+      background: linear-gradient(135deg, var(--blue-2), var(--blue));
+      border-radius: 7px;
+      flex-shrink: 0;
+    }
+    .foot-name { font-size: 14px; font-weight: 700; color: var(--muted); }
+    .foot-links { display: flex; gap: 22px; }
+    .foot-links a {
+      font-size: 13.5px;
+      color: var(--faint);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .foot-links a:hover { color: var(--muted); }
+    .foot-copy { font-size: 13px; color: var(--faint); }
+
+    /* ── Scroll reveal ─────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .reveal.in { opacity: 1; transform: none; }
+    .d1 { transition-delay: .08s; }
+    .d2 { transition-delay: .16s; }
+    .d3 { transition-delay: .24s; }
+    .d4 { transition-delay: .32s; }
+    .d5 { transition-delay: .40s; }
+
+    /* ── Responsive ────────────────────────────────────── */
+    @media (max-width: 920px) {
+      .hero-grid        { grid-template-columns: 1fr; text-align: center; gap: 56px; }
+      .hero-p           { max-width: 100%; }
+      .store-row        { align-items: center; }
+      .phone-wrap       { order: -1; }
+      .features-grid    { grid-template-columns: repeat(2, 1fr); }
+      .steps-grid       { grid-template-columns: 1fr; }
+      .stats-grid       { grid-template-columns: repeat(3, 1fr); }
+      .privacy-card     { grid-template-columns: 1fr; text-align: center; gap: 26px; }
+      .privacy-icon     { margin: 0 auto; }
+      .sec-sub          { max-width: 100%; }
+    }
+    @media (max-width: 600px) {
+      .hero h1          { font-size: 2.3rem; }
+      .features-grid    { grid-template-columns: 1fr; }
+      .stats-grid       { grid-template-columns: 1fr; }
+      .stat-cell        { border-right: none; border-bottom: 1px solid var(--border); }
+      .stat-cell:last-child { border-bottom: none; }
+      .cta-card         { padding: 48px 22px; }
+      .privacy-card     { padding: 36px 22px; }
+      .nav-pill         { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal, .phone, .ambient-blob { animation: none; transition: none; }
+      .reveal { opacity: 1; transform: none; }
+    }
   </style>
 </head>
 <body>
 
-<!-- Hero -->
-<section class="hero">
-  <div class="hero-badge">Доступно на iOS и Android</div>
-  <h1>Ваш гараж всегда под рукой</h1>
-  <p>BnGarage — приложение для учёта автомобилей, истории технического обслуживания и умных напоминаний. Все данные хранятся на вашем устройстве.</p>
-  <div class="store-buttons">
-    <a href="#" class="store-btn apple">
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-      </svg>
-      App Store
+<!-- Ambient glows -->
+<div class="ambient" aria-hidden="true">
+  <div class="ambient-blob ambient-blob-1"></div>
+  <div class="ambient-blob ambient-blob-2"></div>
+  <div class="ambient-blob ambient-blob-3"></div>
+</div>
+
+<!-- Nav -->
+<nav class="nav" aria-label="Навигация">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo" aria-label="BnGarage — главная">
+      <div class="nav-logo-mark" aria-hidden="true">
+        <!-- car icon -->
+        <svg width="16" height="12" viewBox="0 0 20 14" fill="none" aria-hidden="true">
+          <path d="M3 7L9.5 1.5H10.5L17 7V12.5H13.5V9H6.5V12.5H3V7Z" fill="white" opacity=".9"/>
+          <circle cx="6.5" cy="12.5" r="1.5" fill="white" opacity=".6"/>
+          <circle cx="13.5" cy="12.5" r="1.5" fill="white" opacity=".6"/>
+        </svg>
+      </div>
+      <span class="nav-logo-name">BnGarage</span>
     </a>
-    <a href="#" class="store-btn google">
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M3.18 23.76c.37.21.8.22 1.2.04L15.55 12 4.38.21C3.98.02 3.55.04 3.18.25 2.46.67 2 1.46 2 2.33v19.34c0 .87.46 1.66 1.18 2.09zM16.55 13l2.55 2.55-3.69 2.1-2.73-2.73L16.55 13zM19.1 8.45L16.55 11l-3.87-3.87 2.73-2.73 3.69 2.1c.75.42 1.19 1.19 1.19 1.97 0-.01-.01-.02-.19-.02z"/>
+    <a href="#download" class="nav-pill" aria-label="Скачать приложение">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
       </svg>
-      Google Play
+      Скачать
     </a>
   </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" aria-labelledby="hero-h1">
+  <div class="container">
+    <div class="hero-grid">
+
+      <!-- Copy -->
+      <div>
+        <div class="badge" aria-label="Доступно на iOS и Android, бесплатно">
+          <span class="badge-dot" aria-hidden="true"></span>
+          iOS &amp; Android · Бесплатно
+        </div>
+        <h1 id="hero-h1">
+          Ваш гараж<br>
+          <span class="grad">в кармане</span>
+        </h1>
+        <p class="hero-p">
+          Учёт автомобилей, полная история ТО и умные напоминания о смене масла — всё в одном приложении. Без регистрации. Работает офлайн.
+        </p>
+
+        <div class="store-row" id="download">
+          <a href="https://apps.apple.com/app/id6746813625" class="store-btn" target="_blank" rel="noopener noreferrer" aria-label="Загрузить BnGarage в App Store">
+            <img src="appstore_logo.png" alt="App Store" />
+            <div class="store-btn-copy">
+              <span class="store-btn-sub">Загрузить в</span>
+              <span class="store-btn-name">App Store</span>
+            </div>
+          </a>
+          <a href="https://play.google.com/store/apps/details?id=com.bnutss.bngarage" class="store-btn" target="_blank" rel="noopener noreferrer" aria-label="Загрузить BnGarage в Google Play">
+            <img src="google_play_logo.png" alt="Google Play" />
+            <div class="store-btn-copy">
+              <span class="store-btn-sub">Доступно в</span>
+              <span class="store-btn-name">Google Play</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Phone mockup -->
+      <div class="phone-wrap" aria-hidden="true">
+        <div class="phone-glow"></div>
+        <div class="phone" role="img" aria-label="Скриншот приложения BnGarage">
+          <div class="phone-pill"></div>
+          <div class="phone-screen">
+
+            <!-- Status bar -->
+            <div class="ui-sb">
+              <span class="ui-sb-time">9:41</span>
+              <!-- battery / signal placeholder -->
+              <svg width="38" height="10" viewBox="0 0 38 10" fill="none" aria-hidden="true">
+                <rect x="0" y="2" width="5" height="6" rx="1" fill="white" opacity=".55"/>
+                <rect x="7" y="1" width="5" height="8" rx="1" fill="white" opacity=".7"/>
+                <rect x="14" y="0" width="5" height="10" rx="1" fill="white" opacity=".88"/>
+                <rect x="23" y="2" width="12" height="6" rx="1.5" stroke="white" stroke-width="1" opacity=".6"/>
+                <rect x="35" y="3.5" width="2" height="3" rx=".8" fill="white" opacity=".4"/>
+                <rect x="24.5" y="3.5" width="7" height="3" rx=".8" fill="white" opacity=".6"/>
+              </svg>
+            </div>
+
+            <!-- App header -->
+            <div class="ui-header">
+              <div class="ui-logo"></div>
+              <span class="ui-title">BnGarage</span>
+              <div class="ui-badge">2 авто</div>
+            </div>
+
+            <!-- Car card -->
+            <div class="ui-car">
+              <div class="ui-car-row">
+                <div>
+                  <div class="ui-brand">TOYOTA</div>
+                  <div class="ui-model">Camry</div>
+                </div>
+                <div>
+                  <div class="ui-km">87 430 km</div>
+                  <div class="ui-year">2019 г.</div>
+                </div>
+              </div>
+              <div class="ui-chips">
+                <span class="ui-chip">Бензин</span>
+                <span class="ui-chip">Автомат</span>
+                <span class="ui-chip">Sedan</span>
+              </div>
+              <div class="ui-divider"></div>
+              <div style="padding:8px 0 10px;">
+                <div class="ui-status-chip">
+                  <div class="ui-status-dot"></div>
+                  <span class="ui-status-text">Замена масла просрочена</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="ui-stats">
+              <div class="ui-stat">
+                <div class="ui-stat-v">12</div>
+                <div class="ui-stat-l">Записей</div>
+              </div>
+              <div class="ui-stat">
+                <div class="ui-stat-v" style="color:#22D3EE;">87 430</div>
+                <div class="ui-stat-l">Пробег</div>
+              </div>
+              <div class="ui-stat">
+                <div class="ui-stat-v" style="color:#10B981;">3</div>
+                <div class="ui-stat-l">Активных</div>
+              </div>
+            </div>
+
+            <!-- Reminders -->
+            <div class="ui-reminders">
+              <div class="ui-rem ui-rem-red">
+                <div class="ui-rem-dot" style="background:var(--red);"></div>
+                <span class="ui-rem-text">Замена масла — просрочена</span>
+              </div>
+              <div class="ui-rem ui-rem-grn">
+                <div class="ui-rem-dot" style="background:var(--green);"></div>
+                <span class="ui-rem-text">Тормозные колодки — в норме</span>
+              </div>
+            </div>
+
+            <!-- Bottom nav -->
+            <div class="ui-navbar">
+              <div class="ui-tab ui-tab-active">
+                <div class="ui-tab-bar ui-tab-bar-active"></div>
+                <span class="ui-tab-lbl ui-tab-lbl-active">Авто</span>
+              </div>
+              <div class="ui-tab">
+                <div class="ui-tab-bar"></div>
+                <span class="ui-tab-lbl">Напомин.</span>
+              </div>
+              <div class="ui-tab">
+                <div class="ui-tab-bar"></div>
+                <span class="ui-tab-lbl">Настройки</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </section>
+
+<!-- Stats -->
+<div class="section-divider"></div>
+<section class="stats-strip" aria-labelledby="stats-h2">
+  <h2 id="stats-h2" class="sr-only">Статистика приложения</h2>
+  <div class="container">
+    <div class="stats-grid reveal">
+      <div class="stat-cell">
+        <div class="stat-num" data-target="100" data-suffix="%">100%</div>
+        <div class="stat-lbl">Данные хранятся<br>локально на устройстве</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" data-target="3" data-suffix=" языка">3 языка</div>
+        <div class="stat-lbl">Русский, English,<br>O'zbek tili</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" data-text="Бесплатно">Бесплатно</div>
+        <div class="stat-lbl">Без подписки<br>и скрытых платежей</div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="section-divider"></div>
 
 <!-- Features -->
-<section class="section">
-  <div class="section-label">Возможности</div>
-  <h2 class="section-title">Всё для вашего автомобиля</h2>
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">🚗</div>
-      <h3>Учёт автомобилей</h3>
-      <p>Добавляйте несколько автомобилей, храните фото, VIN, пробег и все важные данные в одном месте.</p>
+<section class="features-section" aria-labelledby="feat-h2">
+  <div class="container">
+    <div class="reveal">
+      <div class="sec-eyebrow" aria-hidden="true">
+        <svg width="8" height="8" viewBox="0 0 8 8" fill="var(--cyan)" aria-hidden="true"><circle cx="4" cy="4" r="4"/></svg>
+        Возможности
+      </div>
+      <h2 id="feat-h2" class="sec-h2">Всё что нужно<br>для вашего авто</h2>
+      <p class="sec-sub">Простой и мощный инструмент для контроля технического состояния всех ваших автомобилей — в одном месте.</p>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">🔧</div>
-      <h3>История обслуживания</h3>
-      <p>Записывайте каждое ТО, замену масла, шиномонтаж и любые другие работы с датой и стоимостью.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🔔</div>
-      <h3>Умные напоминания</h3>
-      <p>Никогда не пропустите ТО, страховку или техосмотр — приложение напомнит заранее.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📵</div>
-      <h3>Работает офлайн</h3>
-      <p>Все данные хранятся на устройстве. Интернет не нужен — приложение работает всегда.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📷</div>
-      <h3>Фото автомобиля</h3>
-      <p>Прикрепляйте фотографии к каждому автомобилю прямо с камеры или из галереи.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📊</div>
-      <h3>Расходы под контролем</h3>
-      <p>Отслеживайте сколько вы тратите на обслуживание каждого автомобиля.</p>
+
+    <div class="features-grid">
+
+      <div class="feat-card reveal d1">
+        <div class="feat-icon" style="background:rgba(24,95,165,.14);" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2E86D4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="1" y="3" width="15" height="13" rx="2"/>
+            <path d="M16 8h4l3 3v3h-7V8z"/>
+            <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+        </div>
+        <h3 class="feat-title">Учёт автомобилей</h3>
+        <p class="feat-desc">Добавляйте несколько авто с фото, VIN, цветом и техническими характеристиками.</p>
+      </div>
+
+      <div class="feat-card reveal d2">
+        <div class="feat-icon" style="background:rgba(245,158,11,.11);" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </div>
+        <h3 class="feat-title">История ТО</h3>
+        <p class="feat-desc">Фиксируйте замену масла, фильтров, тормозов с датой, пробегом и стоимостью.</p>
+      </div>
+
+      <div class="feat-card reveal d3">
+        <div class="feat-icon" style="background:rgba(34,211,238,.09);" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </div>
+        <h3 class="feat-title">Умные напоминания</h3>
+        <p class="feat-desc">Уведомления по пробегу и дате: за 30 дней, 7 дней и прямо в день следующего ТО.</p>
+      </div>
+
+      <div class="feat-card reveal d1">
+        <div class="feat-icon" style="background:rgba(16,185,129,.1);" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h3 class="feat-title">Полный офлайн</h3>
+        <p class="feat-desc">Работает без интернета. Все данные хранятся только на вашем устройстве — без облака.</p>
+      </div>
+
+      <div class="feat-card reveal d2">
+        <div class="feat-icon" style="background:rgba(139,92,246,.1);" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+        </div>
+        <h3 class="feat-title">Фото к записям</h3>
+        <p class="feat-desc">Прикрепляйте фотографии чеков и деталей прямо с камеры или из галереи.</p>
+      </div>
+
+      <div class="feat-card reveal d3">
+        <div class="feat-icon" style="background:rgba(239,68,68,.09);" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <h3 class="feat-title">Учёт расходов</h3>
+        <p class="feat-desc">Отслеживайте стоимость каждого обслуживания и контролируйте бюджет на авто.</p>
+      </div>
+
     </div>
   </div>
 </section>
+
+<!-- How it works -->
+<div class="section-divider"></div>
+<section class="how-section" aria-labelledby="how-h2">
+  <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <div class="sec-eyebrow" aria-hidden="true">
+        <svg width="8" height="8" viewBox="0 0 8 8" fill="var(--cyan)" aria-hidden="true"><circle cx="4" cy="4" r="4"/></svg>
+        Как это работает
+      </div>
+      <h2 id="how-h2" class="sec-h2">Начните за 3 шага</h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card reveal d1">
+        <div class="step-num" aria-hidden="true">1</div>
+        <h3 class="step-title">Скачайте приложение</h3>
+        <p class="step-desc">Бесплатно в App Store или Google Play. Регистрация не нужна — просто откройте и начните.</p>
+      </div>
+      <div class="step-card reveal d2">
+        <div class="step-num" aria-hidden="true">2</div>
+        <h3 class="step-title">Добавьте автомобиль</h3>
+        <p class="step-desc">Укажите марку, модель, год, пробег и загрузите фото — займёт меньше минуты.</p>
+      </div>
+      <div class="step-card reveal d3">
+        <div class="step-num" aria-hidden="true">3</div>
+        <h3 class="step-title">Следите за ТО</h3>
+        <p class="step-desc">Записывайте каждое обслуживание — приложение само напомнит о следующем по дате или пробегу.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="section-divider"></div>
 
 <!-- Privacy -->
-<section class="privacy-section">
-  <div class="privacy-inner">
-    <h2>Ваши данные — только ваши</h2>
-    <p>BnGarage не собирает и не передаёт ваши данные на серверы. Вся информация хранится исключительно на вашем устройстве. Никакой регистрации, никаких аккаунтов.</p>
+<section class="privacy-section" aria-labelledby="priv-h2">
+  <div class="container">
+    <div class="privacy-card reveal">
+      <div class="privacy-icon" aria-hidden="true">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <polyline points="9 12 11 14 15 10"/>
+        </svg>
+      </div>
+      <div>
+        <h2 id="priv-h2" class="privacy-h2">Ваши данные<br>принадлежат только вам</h2>
+        <p class="privacy-p">BnGarage не собирает и не передаёт данные на серверы. Вся информация об автомобилях, история ТО и фотографии хранятся исключительно на вашем устройстве. Никакой регистрации, никаких аккаунтов, никакой слежки.</p>
+      </div>
+    </div>
   </div>
 </section>
 
+<!-- CTA -->
+<section class="cta-section" aria-labelledby="cta-h2">
+  <div class="container">
+    <div class="cta-card reveal">
+      <h2 id="cta-h2" class="cta-h2">
+        Начните прямо сейчас —<br>
+        <span class="grad">это бесплатно</span>
+      </h2>
+      <p class="cta-p">Тысячи автовладельцев уже контролируют своё авто с BnGarage. Присоединяйтесь.</p>
+      <div class="cta-btns">
+        <a href="https://apps.apple.com/app/id6746813625" class="cta-primary" target="_blank" rel="noopener noreferrer" aria-label="Скачать BnGarage в App Store">
+          <img src="appstore_logo.png" alt="" aria-hidden="true">
+          App Store
+        </a>
+        <a href="https://play.google.com/store/apps/details?id=com.bnutss.bngarage" class="cta-secondary" target="_blank" rel="noopener noreferrer" aria-label="Скачать BnGarage в Google Play">
+          <img src="google_play_logo.png" alt="" aria-hidden="true">
+          Google Play
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
 <footer>
-  <p>
-    &copy; 2024 BnGarage
-    <a href="index.html">Поддержка</a>
-    <a href="privacy.html">Конфиденциальность</a>
-    <a href="mailto:bnutssdev@gmail.com">Контакты</a>
-  </p>
+  <div class="container">
+    <div class="foot-inner">
+      <a href="index.html" class="foot-logo" aria-label="BnGarage">
+        <div class="foot-mark" aria-hidden="true"></div>
+        <span class="foot-name">BnGarage</span>
+      </a>
+      <nav class="foot-links" aria-label="Ссылки в подвале">
+        <a href="privacy.html">Конфиденциальность</a>
+        <a href="index.html">Поддержка</a>
+        <a href="mailto:bnutssdev@gmail.com">Контакты</a>
+      </nav>
+      <p class="foot-copy">&copy; 2025 BnGarage</p>
+    </div>
+  </div>
 </footer>
+
+<script>
+  // Scroll reveal
+  const io = new IntersectionObserver(
+    entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }),
+    { threshold: 0.1, rootMargin: '0px 0px -32px 0px' }
+  );
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Counter animation
+  function countUp(el) {
+    if (el.dataset.text) { el.textContent = el.dataset.text; return; }
+    const target = +el.dataset.target;
+    const suffix = el.dataset.suffix || '';
+    const dur = 1300;
+    const t0 = performance.now();
+    (function tick(now) {
+      const p = Math.min((now - t0) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(eased * target) + suffix;
+      if (p < 1) requestAnimationFrame(tick);
+    })(t0);
+  }
+
+  const statsIo = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        document.querySelectorAll('[data-target], [data-text]').forEach(countUp);
+        statsIo.disconnect();
+      }
+    });
+  }, { threshold: 0.5 });
+
+  const statsEl = document.querySelector('.stats-grid');
+  if (statsEl) statsIo.observe(statsEl);
+</script>
 
 </body>
 </html>
