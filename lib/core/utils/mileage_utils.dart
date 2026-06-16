@@ -1,7 +1,17 @@
 class MileageUtils {
   static String format(int mileage, [String langCode = 'ru']) {
-    final kmLabel = langCode == 'en' ? 'km' : 'км';
-    final thousandLabel = langCode == 'en' ? 'k $kmLabel' : 'тыс. $kmLabel';
+    String kmLabel;
+    String thousandLabel;
+    if (langCode == 'uz') {
+      kmLabel = 'km';
+      thousandLabel = 'ming $kmLabel';
+    } else if (langCode == 'en') {
+      kmLabel = 'km';
+      thousandLabel = 'k $kmLabel';
+    } else {
+      kmLabel = 'км';
+      thousandLabel = 'тыс. $kmLabel';
+    }
 
     if (mileage >= 1000) {
       final km = mileage / 1000;

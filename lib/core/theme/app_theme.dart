@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AppTheme {
   static const Color primaryColor = Color(0xFF185FA5);
@@ -9,6 +10,9 @@ class AppTheme {
           seedColor: primaryColor,
           brightness: Brightness.light,
         ),
+        appBarTheme: const AppBarTheme(
+          systemOverlayStyle: SystemUiOverlayStyle.dark,
+        ),
       );
 
   static ThemeData get dark => ThemeData(
@@ -16,6 +20,9 @@ class AppTheme {
         colorScheme: ColorScheme.fromSeed(
           seedColor: primaryColor,
           brightness: Brightness.dark,
+        ),
+        appBarTheme: const AppBarTheme(
+          systemOverlayStyle: SystemUiOverlayStyle.light,
         ),
       );
 }

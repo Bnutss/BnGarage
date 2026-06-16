@@ -379,6 +379,12 @@ class _LangPage extends ConsumerWidget {
   final String lang;
   const _LangPage({required this.onNext, required this.lang});
 
+  static const _languages = [
+    _LangOption('🇷🇺', 'Русский', 'Russian', 'ru'),
+    _LangOption('🇬🇧', 'English', 'English', 'en'),
+    _LangOption('🇺🇿', 'O\'zbek', 'O\'zbek tili', 'uz'),
+  ];
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final current = ref.watch(localeProvider).languageCode;
@@ -386,10 +392,9 @@ class _LangPage extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 8),
+          const SizedBox(height: 32),
           // Label
           Text(
             'ЯЗЫК / LANGUAGE',
@@ -420,49 +425,47 @@ class _LangPage extends ConsumerWidget {
               fontSize: 14,
             ),
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 36),
 
-          // Language cards
-          Row(
-            children: [
-              Expanded(
-                child: _LangCard(
-                  flag: '🇷🇺',
-                  name: 'Русский',
-                  sub: 'Russian',
-                  selected: current == 'ru',
-                  onTap: () =>
-                      ref.read(localeProvider.notifier).set(const Locale('ru')),
-                ),
+          // Language list
+          ...List.generate(_languages.length, (i) {
+            final l = _languages[i];
+            final selected = current == l.code;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _LangListTile(
+                flag: l.flag,
+                name: l.name,
+                sub: l.sub,
+                selected: selected,
+                onTap: () => ref
+                    .read(localeProvider.notifier)
+                    .set(Locale(l.code)),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _LangCard(
-                  flag: '🇬🇧',
-                  name: 'English',
-                  sub: 'Английский',
-                  selected: current == 'en',
-                  onTap: () =>
-                      ref.read(localeProvider.notifier).set(const Locale('en')),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 48),
+            );
+          }),
         ],
       ),
     );
   }
 }
 
-class _LangCard extends StatelessWidget {
+class _LangOption {
+  final String flag;
+  final String name;
+  final String sub;
+  final String code;
+  const _LangOption(this.flag, this.name, this.sub, this.code);
+}
+
+class _LangListTile extends StatelessWidget {
   final String flag;
   final String name;
   final String sub;
   final bool selected;
   final VoidCallback onTap;
 
-  const _LangCard({
+  const _LangListTile({
     required this.flag,
     required this.name,
     required this.sub,
@@ -475,80 +478,123 @@ class _LangCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        height: 130,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
           gradient: selected
               ? LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
                   colors: [
-                    _kPrimary.withValues(alpha: 0.2),
-                    _kPrimary.withValues(alpha: 0.05),
+                    _kPrimary.withValues(alpha: 0.22),
+                    _kPrimary.withValues(alpha: 0.06),
                   ],
                 )
               : null,
           color: selected ? null : _kSurface,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: selected
-                ? _kPrimary.withValues(alpha: 0.6)
-                : Colors.white.withValues(alpha: 0.08),
+                ? _kPrimary.withValues(alpha: 0.55)
+                : Colors.white.withValues(alpha: 0.07),
             width: selected ? 1.5 : 1,
           ),
           boxShadow: selected
               ? [
                   BoxShadow(
                     color: _kPrimary.withValues(alpha: 0.25),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
                   ),
                 ]
               : null,
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Row(
           children: [
             // Flag
-            Text(flag, style: const TextStyle(fontSize: 40, height: 1)),
-            const SizedBox(height: 12),
-            Text(
-              name,
-              style: TextStyle(
-                color: selected ? _kText : const Color(0xCCFFFFFF),
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 3),
-            Text(
-              sub,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.35),
-                fontSize: 11,
-              ),
-            ),
-            const SizedBox(height: 8),
-            // Selected indicator
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              width: selected ? 20 : 6,
-              height: 6,
+            Container(
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                gradient: selected
-                    ? const LinearGradient(colors: [_kPriLight, _kPrimary])
-                    : null,
-                color: selected ? null : Colors.transparent,
-                borderRadius: BorderRadius.circular(3),
-                boxShadow: selected
-                    ? [
-                        BoxShadow(
-                          color: _kPrimary.withValues(alpha: 0.5),
-                          blurRadius: 6,
-                        ),
-                      ]
-                    : null,
+                color: selected
+                    ? _kPrimary.withValues(alpha: 0.15)
+                    : Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(12),
               ),
+              child: Center(
+                child: Text(
+                  flag,
+                  style: const TextStyle(fontSize: 26, height: 1),
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            // Name + sub
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: TextStyle(
+                      color: selected ? _kText : const Color(0xCCFFFFFF),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.1,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    sub,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.35),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Check indicator
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: selected
+                  ? Container(
+                      key: const ValueKey('selected'),
+                      width: 22,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [_kPriLight, _kPrimary],
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: _kPrimary.withValues(alpha: 0.5),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.check_rounded,
+                        size: 14,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Container(
+                      key: const ValueKey('unselected'),
+                      width: 22,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
             ),
           ],
         ),

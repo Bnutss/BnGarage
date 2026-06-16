@@ -48,8 +48,17 @@ class AppLocalizations {
   String get carsAddFab        => _s('cars_add_fab');
   String get statusOverdue     => _s('status_overdue');
   String get statusSoon        => _s('status_soon');
-  String carsCount(int n)      => langCode == 'en' ? '$n cars' : '$n авто';
-  String yearDisplay(int year) => langCode == 'en' ? '$year' : '$year г.';
+  String carsCount(int n) {
+    if (langCode == 'uz') return '$n ta avto';
+    if (langCode == 'en') return '$n cars';
+    return '$n авто';
+  }
+
+  String yearDisplay(int year) {
+    if (langCode == 'uz') return '$year-yil';
+    if (langCode == 'en') return '$year';
+    return '$year г.';
+  }
 
   // ── Car detail ──────────────────────────────────────────────────────────────
   String get carServiceHistory => _s('car_service_history');
@@ -57,10 +66,15 @@ class AppLocalizations {
   String get carNoRecords      => _s('car_no_records');
   String get carAddRecord      => _s('car_add_record');
   String get carDeleteTitle    => _s('car_delete_title');
-  String carDeleteBody(String brand, String model) =>
-      langCode == 'en'
-          ? '$brand $model will be permanently deleted along with all service history.'
-          : '$brand $model будет удалён безвозвратно вместе со всей историей обслуживания.';
+  String carDeleteBody(String brand, String model) {
+    if (langCode == 'uz') {
+      return '$brand $model butunlay o\'chiriladi va barcha xizmat tarixi bilan birga.';
+    }
+    if (langCode == 'en') {
+      return '$brand $model will be permanently deleted along with all service history.';
+    }
+    return '$brand $model будет удалён безвозвратно вместе со всей историей обслуживания.';
+  }
   String get carMileageLabel   => _s('car_mileage_label');
   String get carFuelLabel      => _s('car_fuel_label');
   String get carTransLabel     => _s('car_trans_label');
@@ -94,6 +108,7 @@ class AppLocalizations {
       'diesel'   => 'fuel_diesel',
       'electric' => 'fuel_electric',
       'hybrid'   => 'fuel_hybrid',
+      'gas'      => 'fuel_gas',
       _          => 'fuel_gasoline',
     };
     return _s(k);
@@ -119,6 +134,7 @@ class AppLocalizations {
         'diesel':   _s('fuel_diesel'),
         'electric': _s('fuel_electric'),
         'hybrid':   _s('fuel_hybrid'),
+        'gas':      _s('fuel_gas'),
       };
 
   Map<String, String> get transmissionLabels => {
@@ -198,31 +214,68 @@ class AppLocalizations {
   String get settingsGotIt       => _s('settings_got_it');
   String get settingsLangRu      => _s('settings_lang_ru');
   String get settingsLangEn      => _s('settings_lang_en');
+  String get settingsLangUz      => _s('settings_lang_uz');
 
   // ── Parametric ──────────────────────────────────────────────────────────────
-  String overdueByDays(int n) => langCode == 'en'
-      ? '$n ${n == 1 ? 'day' : 'days'} overdue'
-      : 'Просрочено на $n дн.';
+  String overdueByDays(int n) {
+    if (langCode == 'en') {
+      return '$n ${n == 1 ? 'day' : 'days'} overdue';
+    } else if (langCode == 'uz') {
+      return '$n kun ortgan';
+    } else {
+      return 'Просрочено на $n дн.';
+    }
+  }
 
-  String inDays(int n) => langCode == 'en'
-      ? 'In $n ${n == 1 ? 'day' : 'days'}'
-      : 'Через $n дн.';
+  String inDays(int n) {
+    if (langCode == 'en') {
+      return 'In $n ${n == 1 ? 'day' : 'days'}';
+    } else if (langCode == 'uz') {
+      return '$n kun ichida';
+    } else {
+      return 'Через $n дн.';
+    }
+  }
 
-  String overdueByKm(String km) => langCode == 'en'
-      ? '$km overdue'
-      : 'Просрочено на $km';
+  String overdueByKm(String km) {
+    if (langCode == 'en') {
+      return '$km overdue';
+    } else if (langCode == 'uz') {
+      return '$km ortgan';
+    } else {
+      return 'Просрочено на $km';
+    }
+  }
 
-  String inKm(String km) => langCode == 'en'
-      ? 'In $km'
-      : 'Через $km';
+  String inKm(String km) {
+    if (langCode == 'en') {
+      return 'In $km';
+    } else if (langCode == 'uz') {
+      return '$km ichida';
+    } else {
+      return 'Через $km';
+    }
+  }
 
-  String months(int n) => langCode == 'en'
-      ? '$n ${n == 1 ? 'mo.' : 'mo.'}'
-      : '$n мес.';
+  String months(int n) {
+    if (langCode == 'en') {
+      return '$n ${n == 1 ? 'mo.' : 'mo.'}';
+    } else if (langCode == 'uz') {
+      return '$n oy';
+    } else {
+      return '$n мес.';
+    }
+  }
 
-  String inDaysWithDate(int n, String date) => langCode == 'en'
-      ? 'In $n ${n == 1 ? 'day' : 'days'} ($date)'
-      : 'Через $n дн. ($date)';
+  String inDaysWithDate(int n, String date) {
+    if (langCode == 'en') {
+      return 'In $n ${n == 1 ? 'day' : 'days'} ($date)';
+    } else if (langCode == 'uz') {
+      return '$n kun ichida ($date)';
+    } else {
+      return 'Через $n дн. ($date)';
+    }
+  }
 }
 
 // ─── Delegate ─────────────────────────────────────────────────────────────────
@@ -232,7 +285,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      ['ru', 'en'].contains(locale.languageCode);
+      ['ru', 'en', 'uz'].contains(locale.languageCode);
 
   @override
   Future<AppLocalizations> load(Locale locale) async =>

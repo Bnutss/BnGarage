@@ -2,9 +2,11 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/services/notification_service.dart';
 import '../../../../core/utils/date_utils.dart';
 import '../../../cars/data/models/car_model.dart';
 import '../../data/models/service_record_model.dart';
@@ -94,6 +96,19 @@ class _AddRecordScreenState extends ConsumerState<AddRecordScreen> {
           .read(serviceRecordRepositoryProvider)
           .addRecord(widget.car.id, record);
       ref.invalidate(serviceRecordsProvider(widget.car.id));
+
+      // Schedule notifications for the new record
+      final prefs = await SharedPreferences.getInstance();
+      final lang = prefs.getString('locale') ?? 'ru';
+      final carName = '${widget.car.brand} ${widget.car.model}';
+      final ns = NotificationService.instance;
+      if (record.nextDate != null) {
+        await ns.scheduleForRecord(carName, record, lang);
+      }
+      if (record.nextMileage != null) {
+        await ns.checkMileageNotification(carName, widget.car, record, prefs, lang);
+      }
+
       if (mounted) context.pop();
     } catch (e) {
       if (mounted) {

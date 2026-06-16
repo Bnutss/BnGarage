@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -21,6 +22,7 @@ IconData _fuelIcon(String key) => switch (key) {
   'diesel'   => Icons.opacity,
   'electric' => Icons.bolt_rounded,
   'hybrid'   => Icons.eco_rounded,
+  'gas'      => Icons.bubble_chart_rounded,
   _          => Icons.help_outline_rounded,
 };
 
@@ -29,6 +31,7 @@ Color _fuelColor(String key) => switch (key) {
   'diesel'   => const Color(0xFF94A3B8),
   'electric' => const Color(0xFF22D3EE),
   'hybrid'   => const Color(0xFF10B981),
+  'gas'      => const Color(0xFF8B5CF6),
   _          => const Color(0xFF6B7280),
 };
 
@@ -46,7 +49,6 @@ class _AddCarScreenState extends ConsumerState<AddCarScreen> {
   final _modelCtrl    = TextEditingController();
   final _yearCtrl     = TextEditingController();
   final _mileageCtrl  = TextEditingController();
-  final _vinCtrl      = TextEditingController();
   final _colorCtrl    = TextEditingController();
   final _tintCtrl     = TextEditingController();
   String    _fuelType     = 'gasoline';
@@ -62,7 +64,6 @@ class _AddCarScreenState extends ConsumerState<AddCarScreen> {
     _modelCtrl.dispose();
     _yearCtrl.dispose();
     _mileageCtrl.dispose();
-    _vinCtrl.dispose();
     _colorCtrl.dispose();
     _tintCtrl.dispose();
     super.dispose();
@@ -166,7 +167,7 @@ class _AddCarScreenState extends ConsumerState<AddCarScreen> {
         mileage: int.parse(_mileageCtrl.text.trim()),
         fuelType: _fuelType,
         transmission: _transmission,
-        vin: _vinCtrl.text.trim().isEmpty ? null : _vinCtrl.text.trim(),
+        vin: null,
         color: _colorCtrl.text.trim().isEmpty ? null : _colorCtrl.text.trim(),
         hasTint: _hasTint,
         tintPercent: _hasTint ? int.tryParse(_tintCtrl.text.trim()) : null,
@@ -194,9 +195,11 @@ class _AddCarScreenState extends ConsumerState<AddCarScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = context.l10n;
 
-    return Scaffold(
-      backgroundColor: isDark ? _kDarkBg : const Color(0xFFF1F5F9),
-      appBar: _FormAppBar(title: l10n.addCarTitle),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: isDark ? _kDarkBg : const Color(0xFFF1F5F9),
+        appBar: _FormAppBar(title: l10n.addCarTitle),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -310,14 +313,6 @@ class _AddCarScreenState extends ConsumerState<AddCarScreen> {
                   ),
                   const SizedBox(height: 12),
                   _Input(
-                    controller: _vinCtrl,
-                    label: l10n.carVinOptional,
-                    icon: Icons.fingerprint_rounded,
-                    isDark: isDark,
-                    textCapitalization: TextCapitalization.characters,
-                  ),
-                  const SizedBox(height: 10),
-                  _Input(
                     controller: _colorCtrl,
                     label: l10n.carColorOpt,
                     icon: Icons.palette_rounded,
@@ -405,6 +400,7 @@ class _AddCarScreenState extends ConsumerState<AddCarScreen> {
             _SaveButton(isLoading: _isLoading, onTap: _save, l10n: l10n),
           ],
         ),
+      ),
       ),
     );
   }
@@ -582,7 +578,7 @@ class _PhotoPicker extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 140,
+        height: 200,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
@@ -601,18 +597,6 @@ class _PhotoPicker extends StatelessWidget {
                       File(path!),
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => _placeholder(),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            Colors.black.withValues(alpha: 0.45),
-                          ],
-                        ),
-                      ),
                     ),
                     Positioned(
                       bottom: 10,
@@ -636,18 +620,6 @@ class _PhotoPicker extends StatelessWidget {
                               color: Colors.white,
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 12,
-                      left: 12,
-                      child: Text(
-                        l10n.photoTapToSelect,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -868,9 +840,9 @@ class _FuelSelector extends StatelessWidget {
     final entries = l10n.fuelTypeLabels.entries.toList();
     return Column(
       children: [
-        Row(children: entries.sublist(0, 2).map(_item).toList()),
+        Row(children: entries.sublist(0, 3).map(_item).toList()),
         const SizedBox(height: 6),
-        Row(children: entries.sublist(2).map(_item).toList()),
+        Row(children: entries.sublist(3).map(_item).toList()),
       ],
     );
   }

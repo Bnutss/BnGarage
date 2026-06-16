@@ -1,5 +1,5 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -9,15 +9,14 @@ import '../../../../core/utils/mileage_utils.dart';
 import '../../data/models/reminder_model.dart';
 import '../providers/reminders_provider.dart';
 
-// ─── Palette ─────────────────────────────────────────────────────────────────
-const _kPrimary  = Color(0xFF185FA5);
-const _kDarkBg   = Color(0xFF000000);
-const _kSurface  = Color(0xFF0A0A0F);
-const _kOverdue  = Color(0xFFEF4444);
-const _kSoon     = Color(0xFFF59E0B);
-const _kOk       = Color(0xFF10B981);
+const _kPrimary = Color(0xFF185FA5);
+const _kCyan = Color(0xFF22D3EE);
+const _kDarkBg = Color(0xFF000000);
+const _kSurface = Color(0xFF0A0A0F);
+const _kOverdue = Color(0xFFEF4444);
+const _kSoon = Color(0xFFF59E0B);
+const _kOk = Color(0xFF10B981);
 
-// ─── Screen ──────────────────────────────────────────────────────────────────
 class RemindersScreen extends ConsumerWidget {
   const RemindersScreen({super.key});
 
@@ -26,142 +25,174 @@ class RemindersScreen extends ConsumerWidget {
     final remindersAsync = ref.watch(remindersProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor: isDark ? _kDarkBg : const Color(0xFFF1F5F9),
-      appBar: _RemindersAppBar(),
-      body: remindersAsync.when(
-        data: (items) {
-          if (items.isEmpty) return const _EmptyState();
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: isDark
+          ? SystemUiOverlayStyle.light
+          : SystemUiOverlayStyle.dark,
+      child: Scaffold(
+        backgroundColor: isDark ? _kDarkBg : const Color(0xFFF1F5F9),
+        body: Stack(
+          children: [
+            Positioned(
+              top: -80,
+              right: -60,
+              child: _AmbientBlob(color: _kPrimary, size: 220, isDark: isDark),
+            ),
+            Positioned(
+              bottom: 100,
+              left: -40,
+              child: _AmbientBlob(color: _kCyan, size: 180, isDark: isDark),
+            ),
+            SafeArea(
+              child: Column(
+                children: [
+                  _RemindersHeader(isDark: isDark),
+                  Expanded(
+                    child: remindersAsync.when(
+                      data: (items) {
+                        if (items.isEmpty) return const _EmptyState();
 
-          final overdue = items.where((i) => i.status == ReminderStatus.overdue).toList();
-          final soon    = items.where((i) => i.status == ReminderStatus.soon).toList();
-          final ok      = items.where((i) => i.status == ReminderStatus.ok).toList();
-          final l10n    = context.l10n;
+                        final overdue = items.where((i) => i.status == ReminderStatus.overdue).toList();
+                        final soon = items.where((i) => i.status == ReminderStatus.soon).toList();
+                        final ok = items.where((i) => i.status == ReminderStatus.ok).toList();
+                        final l10n = context.l10n;
 
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
-            children: [
-              // Stats row
-              _StatsRow(
-                overdueCount: overdue.length,
-                soonCount: soon.length,
-                okCount: ok.length,
-                isDark: isDark,
-                l10n: l10n,
+                        return ListView(
+                          padding: const EdgeInsets.fromLTRB(20, 12, 20, 120),
+                          children: [
+                            _StatsRow(
+                              overdueCount: overdue.length,
+                              soonCount: soon.length,
+                              okCount: ok.length,
+                              isDark: isDark,
+                              l10n: l10n,
+                            ),
+                            const SizedBox(height: 24),
+
+                            if (overdue.isNotEmpty) ...[
+                              _SectionHeader(
+                                label: l10n.remindersOverdue,
+                                count: overdue.length,
+                                color: _kOverdue,
+                                icon: Icons.warning_amber_rounded,
+                                isDark: isDark,
+                              ),
+                              const SizedBox(height: 10),
+                              ...overdue.asMap().entries.map(
+                                    (e) => _ReminderCard(item: e.value, index: e.key, isDark: isDark, l10n: l10n),
+                                  ),
+                              const SizedBox(height: 20),
+                            ],
+
+                            if (soon.isNotEmpty) ...[
+                              _SectionHeader(
+                                label: l10n.remindersSoon,
+                                count: soon.length,
+                                color: _kSoon,
+                                icon: Icons.access_time_rounded,
+                                isDark: isDark,
+                              ),
+                              const SizedBox(height: 10),
+                              ...soon.asMap().entries.map(
+                                    (e) => _ReminderCard(
+                                      item: e.value,
+                                      index: overdue.length + e.key,
+                                      isDark: isDark,
+                                      l10n: l10n,
+                                    ),
+                                  ),
+                              const SizedBox(height: 20),
+                            ],
+
+                            if (ok.isNotEmpty) ...[
+                              _SectionHeader(
+                                label: l10n.remindersOk,
+                                count: ok.length,
+                                color: _kOk,
+                                icon: Icons.check_circle_rounded,
+                                isDark: isDark,
+                              ),
+                              const SizedBox(height: 10),
+                              ...ok.asMap().entries.map(
+                                    (e) => _ReminderCard(
+                                      item: e.value,
+                                      index: overdue.length + soon.length + e.key,
+                                      isDark: isDark,
+                                      l10n: l10n,
+                                    ),
+                                  ),
+                            ],
+                          ],
+                        );
+                      },
+                      loading: () => const Center(
+                        child: CircularProgressIndicator(color: _kPrimary),
+                      ),
+                      error: (e, _) => Center(
+                        child: Text('${context.l10n.errorPrefix}$e', style: const TextStyle(color: _kOverdue)),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-
-              // Overdue section
-              if (overdue.isNotEmpty) ...[
-                _SectionHeader(
-                  label: l10n.remindersOverdue,
-                  count: overdue.length,
-                  color: _kOverdue,
-                  icon: Icons.warning_amber_rounded,
-                  isDark: isDark,
-                ),
-                const SizedBox(height: 8),
-                ...overdue.asMap().entries.map(
-                  (e) => _ReminderCard(item: e.value, index: e.key, isDark: isDark, l10n: l10n),
-                ),
-                const SizedBox(height: 16),
-              ],
-
-              // Soon section
-              if (soon.isNotEmpty) ...[
-                _SectionHeader(
-                  label: l10n.remindersSoon,
-                  count: soon.length,
-                  color: _kSoon,
-                  icon: Icons.access_time_rounded,
-                  isDark: isDark,
-                ),
-                const SizedBox(height: 8),
-                ...soon.asMap().entries.map(
-                  (e) => _ReminderCard(
-                    item: e.value,
-                    index: overdue.length + e.key,
-                    isDark: isDark,
-                    l10n: l10n,
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
-
-              // OK section
-              if (ok.isNotEmpty) ...[
-                _SectionHeader(
-                  label: l10n.remindersOk,
-                  count: ok.length,
-                  color: _kOk,
-                  icon: Icons.check_circle_rounded,
-                  isDark: isDark,
-                ),
-                const SizedBox(height: 8),
-                ...ok.asMap().entries.map(
-                  (e) => _ReminderCard(
-                    item: e.value,
-                    index: overdue.length + soon.length + e.key,
-                    isDark: isDark,
-                    l10n: l10n,
-                  ),
-                ),
-              ],
-            ],
-          );
-        },
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: _kPrimary),
-        ),
-        error: (e, _) => Center(
-          child: Text('${context.l10n.errorPrefix}$e', style: const TextStyle(color: _kOverdue)),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-// ─── App Bar ─────────────────────────────────────────────────────────────────
-class _RemindersAppBar extends StatelessWidget implements PreferredSizeWidget {
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+class _AmbientBlob extends StatelessWidget {
+  final Color color;
+  final double size;
+  final bool isDark;
+  const _AmbientBlob({required this.color, required this.size, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      backgroundColor: Colors.transparent,
-      automaticallyImplyLeading: false,
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-            colors: [Color(0xFF070C14), Color(0xFF0D1B2E), Color(0xFF185FA5)],
-            stops: [0.0, 0.5, 1.0],
-          ),
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [
+            color.withValues(alpha: isDark ? 0.12 : 0.05),
+            Colors.transparent,
+          ],
         ),
       ),
-      title: Row(
+    );
+  }
+}
+
+class _RemindersHeader extends StatelessWidget {
+  final bool isDark;
+  const _RemindersHeader({required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+      child: Row(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
             child: Image.asset(
               'assets/images/logo.png',
-              width: 34,
-              height: 34,
-              fit: BoxFit.cover,
+              width: 36,
+              height: 36,
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Text(
             context.l10n.remindersTitle,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
+            style: TextStyle(
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
+              fontSize: 20,
               fontWeight: FontWeight.w700,
-              letterSpacing: 0.3,
+              letterSpacing: 0.2,
             ),
           ),
         ],
@@ -170,7 +201,6 @@ class _RemindersAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-// ─── Stats Row ────────────────────────────────────────────────────────────────
 class _StatsRow extends StatelessWidget {
   final int overdueCount;
   final int soonCount;
@@ -216,55 +246,47 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? color.withValues(alpha: 0.1)
-                  : color.withValues(alpha: 0.07),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: color.withValues(alpha: isDark ? 0.2 : 0.15),
-                width: 1,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        decoration: BoxDecoration(
+          color: isDark
+              ? color.withValues(alpha: 0.1)
+              : color.withValues(alpha: 0.07),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: color.withValues(alpha: isDark ? 0.2 : 0.15),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '$count',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                color: color,
+                height: 1,
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$count',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    color: color,
-                    height: 1,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.45)
-                        : Colors.black.withValues(alpha: 0.4),
-                  ),
-                ),
-              ],
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.45)
+                    : Colors.black.withValues(alpha: 0.4),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 }
 
-// ─── Section Header ───────────────────────────────────────────────────────────
 class _SectionHeader extends StatelessWidget {
   final String label;
   final int count;
@@ -293,7 +315,7 @@ class _SectionHeader extends StatelessWidget {
           ),
           child: Icon(icon, size: 15, color: color),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 10),
         Text(
           label,
           style: TextStyle(
@@ -303,9 +325,9 @@ class _SectionHeader extends StatelessWidget {
             letterSpacing: 0.2,
           ),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 8),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(10),
@@ -324,7 +346,6 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-// ─── Reminder Card ────────────────────────────────────────────────────────────
 class _ReminderCard extends StatefulWidget {
   final ReminderItem item;
   final int index;
@@ -374,24 +395,27 @@ class _ReminderCardState extends State<_ReminderCard>
 
   Color get _statusColor {
     switch (widget.item.status) {
-      case ReminderStatus.overdue: return _kOverdue;
-      case ReminderStatus.soon:    return _kSoon;
-      case ReminderStatus.ok:      return _kOk;
+      case ReminderStatus.overdue:
+        return _kOverdue;
+      case ReminderStatus.soon:
+        return _kSoon;
+      case ReminderStatus.ok:
+        return _kOk;
     }
   }
 
   String get _subtitleText {
     final record = widget.item.record;
-    final car    = widget.item.car;
-    final l10n   = widget.l10n;
-    String text  = '';
+    final car = widget.item.car;
+    final l10n = widget.l10n;
+    String text = '';
 
     final nextMileage = record.nextMileage;
     if (nextMileage != null) {
       final diff = nextMileage - car.mileage;
       text += diff <= 0
-          ? l10n.overdueByKm(MileageUtils.format(diff.abs()))
-          : l10n.inKm(MileageUtils.format(diff));
+          ? l10n.overdueByKm(MileageUtils.format(diff.abs(), l10n.langCode))
+          : l10n.inKm(MileageUtils.format(diff, l10n.langCode));
     }
 
     final nextDate = record.nextDate;
@@ -412,10 +436,10 @@ class _ReminderCardState extends State<_ReminderCard>
 
   @override
   Widget build(BuildContext context) {
-    final cat    = AppConstants.getCategoryByKey(widget.item.record.category);
+    final cat = AppConstants.getCategoryByKey(widget.item.record.category);
     final record = widget.item.record;
-    final car    = widget.item.car;
-    final color  = _statusColor;
+    final car = widget.item.car;
+    final color = _statusColor;
     final isAlert = widget.item.status != ReminderStatus.ok;
 
     return FadeTransition(
@@ -429,47 +453,42 @@ class _ReminderCardState extends State<_ReminderCard>
           ),
           child: Container(
             margin: const EdgeInsets.only(bottom: 10),
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: widget.isDark ? _kSurface : Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(18),
               border: Border.all(
                 color: isAlert
                     ? color.withValues(alpha: 0.3)
                     : (widget.isDark
                         ? Colors.white.withValues(alpha: 0.06)
                         : Colors.black.withValues(alpha: 0.05)),
-                width: 1,
               ),
               boxShadow: [
                 BoxShadow(
                   color: isAlert
                       ? color.withValues(alpha: 0.1)
                       : Colors.black.withValues(alpha: widget.isDark ? 0.25 : 0.04),
-                  blurRadius: 12,
+                  blurRadius: 14,
                   offset: const Offset(0, 4),
                 ),
               ],
             ),
             child: Row(
               children: [
-                // Category icon
                 Container(
-                  width: 46,
-                  height: 46,
+                  width: 48,
+                  height: 48,
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(13),
+                    borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: color.withValues(alpha: 0.2),
-                      width: 1,
                     ),
                   ),
-                  child: Icon(cat.icon, size: 20, color: color),
+                  child: Icon(cat.icon, size: 21, color: color),
                 ),
-                const SizedBox(width: 12),
-
-                // Info
+                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -491,7 +510,7 @@ class _ReminderCardState extends State<_ReminderCard>
                             ),
                           ),
                           if (isAlert) ...[
-                            const SizedBox(width: 6),
+                            const SizedBox(width: 8),
                             _AlertPill(
                               isOverdue: widget.item.status == ReminderStatus.overdue,
                               color: color,
@@ -500,7 +519,7 @@ class _ReminderCardState extends State<_ReminderCard>
                           ],
                         ],
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 4),
                       Text(
                         '${car.brand} ${car.model}',
                         style: TextStyle(
@@ -510,7 +529,7 @@ class _ReminderCardState extends State<_ReminderCard>
                               : const Color(0xFF94A3B8),
                         ),
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 6),
                       Text(
                         _subtitleText,
                         style: TextStyle(
@@ -524,10 +543,10 @@ class _ReminderCardState extends State<_ReminderCard>
                     ],
                   ),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 6),
                 Icon(
-                  Icons.chevron_right,
-                  size: 16,
+                  Icons.chevron_right_rounded,
+                  size: 18,
                   color: widget.isDark
                       ? Colors.white.withValues(alpha: 0.18)
                       : Colors.black.withValues(alpha: 0.15),
@@ -541,7 +560,6 @@ class _ReminderCardState extends State<_ReminderCard>
   }
 }
 
-// ─── Alert Pill ───────────────────────────────────────────────────────────────
 class _AlertPill extends StatefulWidget {
   final bool isOverdue;
   final Color color;
@@ -580,13 +598,12 @@ class _AlertPillState extends State<_AlertPill>
     return AnimatedBuilder(
       animation: _anim,
       builder: (_, child) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
           color: widget.color.withValues(alpha: 0.08 + _anim.value * 0.08),
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: widget.color.withValues(alpha: 0.3 + _anim.value * 0.22),
-            width: 1,
           ),
         ),
         child: Row(
@@ -606,7 +623,7 @@ class _AlertPillState extends State<_AlertPill>
                 ],
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 5),
             Text(
               label,
               style: TextStyle(
@@ -622,7 +639,6 @@ class _AlertPillState extends State<_AlertPill>
   }
 }
 
-// ─── Empty State ─────────────────────────────────────────────────────────────
 class _EmptyState extends StatefulWidget {
   const _EmptyState();
 

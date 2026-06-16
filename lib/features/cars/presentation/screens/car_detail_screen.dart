@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -33,19 +34,22 @@ class CarDetailScreen extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = context.l10n;
 
-    return Scaffold(
-      backgroundColor: isDark ? _kDarkBg : const Color(0xFFF1F5F9),
-      body: CustomScrollView(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: isDark ? _kDarkBg : const Color(0xFFF1F5F9),
+        body: CustomScrollView(
         physics: const BouncingScrollPhysics(
           parent: AlwaysScrollableScrollPhysics(),
         ),
         slivers: [
           // ── Hero App Bar ──
           SliverAppBar(
-            expandedHeight: 300,
+            expandedHeight: 220,
             pinned: true,
             elevation: 0,
             backgroundColor: const Color(0xFF0D1B2E),
+            systemOverlayStyle: SystemUiOverlayStyle.light,
             leading: _CircleIconButton(
               icon: Icons.arrow_back,
               onTap: () => context.pop(),
@@ -188,6 +192,7 @@ class CarDetailScreen extends ConsumerWidget {
         label: l10n.carAddRecord,
         onPressed: () =>
             context.push('/cars/${car.id}/records/add', extra: car),
+      ),
       ),
     );
   }
@@ -551,7 +556,7 @@ class _HeroBackground extends StatelessWidget {
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.transparent,
-                  Colors.black.withValues(alpha: 0.72),
+                  Colors.black.withValues(alpha: 0.55),
                 ],
               ),
             ),
@@ -570,7 +575,7 @@ class _HeroBackground extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.black.withValues(alpha: 0.4),
+                  Colors.black.withValues(alpha: 0.35),
                   Colors.transparent,
                 ],
               ),

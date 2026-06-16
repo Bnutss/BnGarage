@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/l10n/app_localizations.dart';
@@ -14,9 +15,24 @@ const _kPriLight = Color(0xFF2E86D4);
 const _kCyan = Color(0xFF22D3EE);
 const _kAccentDeep = Color(0xFF0A2444);
 const _kDarkBg = Color(0xFF000000);
-const _kSurface = Color(0xFF0A0A0F);
 const _kOverdue = Color(0xFFEF4444);
 const _kSoon = Color(0xFFF59E0B);
+
+IconData _fuelIcon(String t) {
+  final s = t.toLowerCase();
+  if (s.contains('электр') || s == 'electric' || s == 'ev') {
+    return Icons.electric_bolt;
+  }
+  if (s.contains('дизел') || s == 'diesel') return Icons.local_gas_station;
+  if (s.contains('газ') || s == 'gas' || s == 'lpg') return Icons.bubble_chart;
+  if (s.contains('гибрид') || s == 'hybrid') return Icons.sync_alt;
+  return Icons.local_gas_station;
+}
+
+bool _isAuto(String t) {
+  final s = t.toLowerCase();
+  return s.contains('авто') || s == 'automatic' || s == 'auto';
+}
 
 // ─── Screen ──────────────────────────────────────────────────────────────────
 class CarsListScreen extends ConsumerWidget {
@@ -27,30 +43,36 @@ class CarsListScreen extends ConsumerWidget {
     final carsAsync = ref.watch(carsProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor: isDark ? _kDarkBg : const Color(0xFFF1F5F9),
-      appBar: _GradientAppBar(carCount: carsAsync.value?.length ?? 0),
-      body: carsAsync.when(
-        data: (cars) {
-          if (cars.isEmpty) {
-            return _EmptyState(onAddTap: () => context.push('/cars/add'));
-          }
-          return _CarsCarousel(cars: cars);
-        },
-        loading: () =>
-            const Center(child: CircularProgressIndicator(color: _kPrimary)),
-        error: (e, _) => Center(
-          child: Text(
-            '${context.l10n.errorPrefix}$e',
-            style: const TextStyle(color: _kOverdue),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+      child: Scaffold(
+        backgroundColor: isDark ? _kDarkBg : const Color(0xFFF1F5F9),
+        appBar: _GradientAppBar(
+          carCount: carsAsync.value?.length ?? 0,
+          isDark: isDark,
+        ),
+        body: carsAsync.when(
+          data: (cars) {
+            if (cars.isEmpty) {
+              return _EmptyState(onAddTap: () => context.push('/cars/add'));
+            }
+            return _CarsCarousel(cars: cars);
+          },
+          loading: () =>
+              const Center(child: CircularProgressIndicator(color: _kPrimary)),
+          error: (e, _) => Center(
+            child: Text(
+              '${context.l10n.errorPrefix}$e',
+              style: const TextStyle(color: _kOverdue),
+            ),
           ),
         ),
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.only(bottom: 110),
+          child: _GradientFAB(onPressed: () => context.push('/cars/add')),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 110),
-        child: _GradientFAB(onPressed: () => context.push('/cars/add')),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
@@ -58,8 +80,9 @@ class CarsListScreen extends ConsumerWidget {
 // ─── App Bar ─────────────────────────────────────────────────────────────────
 class _GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
   final int carCount;
+  final bool isDark;
 
-  const _GradientAppBar({required this.carCount});
+  const _GradientAppBar({required this.carCount, required this.isDark});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -81,6 +104,7 @@ class _GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
+      systemOverlayStyle: SystemUiOverlayStyle.light,
       title: Row(
         children: [
           ClipRRect(
@@ -148,7 +172,7 @@ class _CarsCarouselState extends State<_CarsCarousel> {
   @override
   void initState() {
     super.initState();
-    _pageCtrl = PageController(viewportFraction: 0.88);
+    _pageCtrl = PageController(viewportFraction: 1.0);
   }
 
   @override
@@ -159,24 +183,30 @@ class _CarsCarouselState extends State<_CarsCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(height: 20),
-        SizedBox(
-          height: 280,
-          child: PageView.builder(
-            controller: _pageCtrl,
-            itemCount: widget.cars.length,
-            onPageChanged: (i) => setState(() => _current = i),
-            itemBuilder: (ctx, i) =>
-                _CarCard(car: widget.cars[i], index: i, l10n: context.l10n),
+    return SingleChildScrollView(
+      physics: const NeverScrollableScrollPhysics(),
+      child: Column(
+        children: [
+          const SizedBox(height: 24),
+          SizedBox(
+            height: 232,
+            child: PageView.builder(
+              controller: _pageCtrl,
+              itemCount: widget.cars.length,
+              onPageChanged: (i) => setState(() => _current = i),
+              itemBuilder: (ctx, i) => _CarCard(
+                car: widget.cars[i],
+                index: i,
+                l10n: context.l10n,
+              ),
+            ),
           ),
-        ),
-        if (widget.cars.length > 1) ...[
-          const SizedBox(height: 16),
-          _PageDots(count: widget.cars.length, current: _current),
+          const SizedBox(height: 20),
+          if (widget.cars.length > 1)
+            _PageDots(count: widget.cars.length, current: _current),
+          const SizedBox(height: 130),
         ],
-      ],
+      ),
     );
   }
 }
@@ -190,24 +220,30 @@ class _PageDots extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(count, (i) {
         final active = i == current;
         return AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeOut,
+          duration: const Duration(milliseconds: 280),
+          curve: Curves.easeOutCubic,
           margin: const EdgeInsets.symmetric(horizontal: 3),
-          width: active ? 20 : 6,
+          width: active ? 22 : 6,
           height: 6,
           decoration: BoxDecoration(
             color: active
-                ? _kPrimary
-                : (isDark
-                      ? Colors.white.withValues(alpha: 0.2)
-                      : Colors.black.withValues(alpha: 0.15)),
+                ? _kCyan
+                : Colors.white.withValues(alpha: 0.18),
             borderRadius: BorderRadius.circular(3),
+            boxShadow: active
+                ? [
+                    BoxShadow(
+                      color: _kCyan.withValues(alpha: 0.45),
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                    ),
+                  ]
+                : null,
           ),
         );
       }),
@@ -238,11 +274,11 @@ class _CarCardState extends ConsumerState<_CarCard>
     super.initState();
     _ctrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 420),
+      duration: const Duration(milliseconds: 480),
     );
     _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
     _slide = Tween<Offset>(
-      begin: const Offset(0, 0.1),
+      begin: const Offset(0, 0.08),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
 
@@ -260,7 +296,8 @@ class _CarCardState extends ConsumerState<_CarCard>
   @override
   Widget build(BuildContext context) {
     final recordsAsync = ref.watch(serviceRecordsProvider(widget.car.id));
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final car = widget.car;
+    final l10n = widget.l10n;
 
     bool hasOverdue = false;
     bool hasSoon = false;
@@ -271,9 +308,9 @@ class _CarCardState extends ConsumerState<_CarCard>
         final nextMileage = record.nextMileage;
         final nextDate = record.nextDate;
         if (nextMileage != null) {
-          if (widget.car.mileage >= nextMileage) {
+          if (car.mileage >= nextMileage) {
             hasOverdue = true;
-          } else if (widget.car.mileage >= nextMileage - 500) {
+          } else if (car.mileage >= nextMileage - 500) {
             hasSoon = true;
           }
         }
@@ -287,88 +324,224 @@ class _CarCardState extends ConsumerState<_CarCard>
       }
     }
 
+    final glowColor = hasOverdue
+        ? _kOverdue.withValues(alpha: 0.25)
+        : hasSoon
+            ? _kSoon.withValues(alpha: 0.2)
+            : _kPrimary.withValues(alpha: 0.2);
+
+    final borderColor = hasOverdue
+        ? _kOverdue.withValues(alpha: 0.55)
+        : hasSoon
+            ? _kSoon.withValues(alpha: 0.55)
+            : Colors.white.withValues(alpha: 0.1);
+
     return FadeTransition(
       opacity: _fade,
       child: SlideTransition(
         position: _slide,
         child: GestureDetector(
-          onTap: () =>
-              context.push('/cars/${widget.car.id}', extra: widget.car),
+          onTap: () => context.push('/cars/${car.id}', extra: car),
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: hasOverdue
-                    ? _kOverdue.withValues(alpha: 0.4)
-                    : hasSoon
-                    ? _kSoon.withValues(alpha: 0.4)
-                    : isDark
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.black.withValues(alpha: 0.06),
-                width: 1,
-              ),
+              border: Border.all(color: borderColor, width: 1),
               boxShadow: [
                 BoxShadow(
-                  color: hasOverdue
-                      ? _kOverdue.withValues(alpha: 0.18)
-                      : hasSoon
-                      ? _kSoon.withValues(alpha: 0.14)
-                      : Colors.black.withValues(alpha: isDark ? 0.4 : 0.1),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+                  color: glowColor,
+                  blurRadius: 32,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 10),
                 ),
               ],
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(24),
-              child: Column(
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  // ── Photo / Gradient ──
-                  Expanded(
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        _CardVisual(car: widget.car),
-                        // Status badge top-right
-                        if (hasOverdue || hasSoon)
-                          Positioned(
-                            top: 12,
-                            right: 12,
-                            child: _StatusPill(
-                              isOverdue: hasOverdue,
-                              l10n: widget.l10n,
-                            ),
-                          ),
-                        // Bottom gradient overlay for info readability
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          child: Container(
-                            height: 60,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.transparent,
-                                  Colors.black.withValues(alpha: 0.55),
-                                ],
-                              ),
-                            ),
-                          ),
+                  // ── Background: photo or gradient ──
+                  _CardVisual(car: car),
+
+                  // ── Top scrim for legibility ──
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 72,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.55),
+                            Colors.transparent,
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                  // ── Info Section ──
-                  _CardInfo(car: widget.car, isDark: isDark, l10n: widget.l10n),
+
+                  // ── Brand label – top left ──
+                  Positioned(
+                    top: 16,
+                    left: 20,
+                    child: Text(
+                      car.brand.toUpperCase(),
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.6),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 3.0,
+                      ),
+                    ),
+                  ),
+
+                  // ── Status pill – top right ──
+                  if (hasOverdue || hasSoon)
+                    Positioned(
+                      top: 12,
+                      right: 14,
+                      child: _StatusPill(isOverdue: hasOverdue, l10n: l10n),
+                    ),
+
+                  // ── Bottom info panel ──
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(20, 28, 20, 18),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withValues(alpha: 0.92),
+                          ],
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Car name + arrow
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  '${car.brand} ${car.model}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -0.4,
+                                    height: 1.1,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                size: 13,
+                                color: Colors.white.withValues(alpha: 0.35),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          // Stats row
+                          Row(
+                            children: [
+                              _StatChip(
+                                icon: _fuelIcon(car.fuelType),
+                                label: l10n.fuelLabelRaw(car.fuelType),
+                              ),
+                              const SizedBox(width: 7),
+                              _StatChip(
+                                icon: _isAuto(car.transmission)
+                                    ? Icons.settings_backup_restore
+                                    : Icons.tune,
+                                label: l10n.transmissionLabel(car.transmission),
+                              ),
+                              const Spacer(),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    MileageUtils.format(
+                                      car.mileage,
+                                      l10n.langCode,
+                                    ),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    l10n.yearDisplay(car.year),
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(alpha: 0.42),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ─── Stat Chip ───────────────────────────────────────────────────────────────
+class _StatChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _StatChip({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.11),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 11, color: Colors.white70),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.75),
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -394,7 +567,7 @@ class _CardVisual extends StatelessWidget {
       return Image.file(
         File(car.photoUrl!),
         fit: BoxFit.cover,
-        errorBuilder: (_, err, st) => _GradientVisual(car: car, seed: _seed()),
+        errorBuilder: (context, e, _) => _GradientVisual(car: car, seed: _seed()),
       );
     }
     return _GradientVisual(car: car, seed: _seed());
@@ -409,7 +582,7 @@ class _GradientVisual extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c2 = Color.lerp(seed, _kAccentDeep, 0.6)!;
+    final c2 = Color.lerp(seed, _kAccentDeep, 0.65)!;
     final initial = car.brand.isNotEmpty ? car.brand[0].toUpperCase() : 'C';
 
     return Container(
@@ -418,253 +591,75 @@ class _GradientVisual extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [seed, c2, _kDarkBg],
-          stops: const [0.0, 0.55, 1.0],
+          stops: const [0.0, 0.5, 1.0],
         ),
       ),
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // Decorative circles
+          // Decorative circle – top-right
           Positioned(
-            right: -40,
-            top: -40,
+            right: -30,
+            top: -30,
             child: Container(
-              width: 160,
-              height: 160,
+              width: 130,
+              height: 130,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.05),
+              ),
+            ),
+          ),
+          // Decorative circle – bottom-left
+          Positioned(
+            left: -20,
+            bottom: -20,
+            child: Container(
+              width: 90,
+              height: 90,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white.withValues(alpha: 0.04),
               ),
             ),
           ),
-          Positioned(
-            left: -30,
-            bottom: -30,
-            child: Container(
-              width: 110,
-              height: 110,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.03),
-              ),
-            ),
-          ),
-          // Cyan accent line (like the logo)
+          // Cyan accent line at bottom
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: Container(
-              height: 2,
+              height: 1.5,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
                     Colors.transparent,
-                    _kCyan.withValues(alpha: 0.6),
+                    _kCyan.withValues(alpha: 0.55),
                     Colors.transparent,
                   ],
                 ),
               ),
             ),
           ),
-          // Initials
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  initial,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    fontSize: 80,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -2,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Brand name top-left
+          // Large initial letter
           Positioned(
-            top: 14,
-            left: 16,
-            child: Text(
-              car.brand.toUpperCase(),
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.5),
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 2.5,
+            right: 20,
+            top: 0,
+            bottom: 0,
+            child: Center(
+              child: Text(
+                initial,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.07),
+                  fontSize: 140,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -4,
+                ),
               ),
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-// ─── Card Info Section ────────────────────────────────────────────────────────
-class _CardInfo extends StatelessWidget {
-  final CarModel car;
-  final bool isDark;
-  final AppLocalizations l10n;
-
-  const _CardInfo({
-    required this.car,
-    required this.isDark,
-    required this.l10n,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
-      color: isDark ? _kSurface : Colors.white,
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${car.brand} ${car.model}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
-                    letterSpacing: 0.1,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 5),
-                Row(
-                  children: [
-                    _InlineBadge(
-                      icon: _fuelIcon(car.fuelType),
-                      label: l10n.fuelLabelRaw(car.fuelType),
-                      color: _fuelColor(car.fuelType),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 7),
-                      width: 3,
-                      height: 3,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.2)
-                            : Colors.black.withValues(alpha: 0.15),
-                      ),
-                    ),
-                    _InlineBadge(
-                      icon: _isAuto(car.transmission)
-                          ? Icons.settings_backup_restore
-                          : Icons.tune,
-                      label: l10n.transmissionLabel(car.transmission),
-                      color: isDark
-                          ? const Color(0xFF64748B)
-                          : const Color(0xFF94A3B8),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                MileageUtils.format(car.mileage, context.l10n.langCode),
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.75)
-                      : const Color(0xFF334155),
-                ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                l10n.yearDisplay(car.year),
-                style: TextStyle(
-                  fontSize: 11,
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.35)
-                      : const Color(0xFF94A3B8),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(width: 8),
-          Icon(
-            Icons.chevron_right,
-            size: 18,
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.2)
-                : Colors.black.withValues(alpha: 0.15),
-          ),
-        ],
-      ),
-    );
-  }
-
-  IconData _fuelIcon(String t) {
-    final s = t.toLowerCase();
-    if (s.contains('электр') || s == 'electric' || s == 'ev')
-      return Icons.electric_bolt;
-    if (s.contains('дизел') || s == 'diesel') return Icons.local_gas_station;
-    if (s.contains('газ') || s == 'gas' || s == 'lpg')
-      return Icons.bubble_chart;
-    if (s.contains('гибрид') || s == 'hybrid') return Icons.sync_alt;
-    return Icons.local_gas_station;
-  }
-
-  Color _fuelColor(String t) {
-    final s = t.toLowerCase();
-    if (s.contains('электр') || s == 'electric' || s == 'ev')
-      return const Color(0xFF0D9488);
-    if (s.contains('дизел') || s == 'diesel') return const Color(0xFFD97706);
-    if (s.contains('газ') || s == 'gas' || s == 'lpg')
-      return const Color(0xFF7C3AED);
-    if (s.contains('гибрид') || s == 'hybrid') return const Color(0xFF059669);
-    return _kPriLight;
-  }
-
-  bool _isAuto(String t) {
-    final s = t.toLowerCase();
-    return s.contains('авто') || s == 'automatic' || s == 'auto';
-  }
-}
-
-// ─── Inline Badge ─────────────────────────────────────────────────────────────
-class _InlineBadge extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-
-  const _InlineBadge({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 11, color: color),
-        const SizedBox(width: 3),
-        Text(
-          label,
-          style: TextStyle(
-            color: color,
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
     );
   }
 }
@@ -710,7 +705,7 @@ class _StatusPillState extends State<_StatusPill>
 
     return AnimatedBuilder(
       animation: _anim,
-      builder: (_, child) => Container(
+      builder: (context, _) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
           color: Colors.black.withValues(alpha: 0.55),

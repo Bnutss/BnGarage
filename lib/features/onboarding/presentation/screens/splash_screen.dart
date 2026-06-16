@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/services/notification_service.dart';
 import '../../data/onboarding_prefs.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -52,7 +57,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   Future<void> _navigate() async {
     final done = await OnboardingPrefs.isDone();
-    if (mounted) context.go(done ? '/cars' : '/onboarding');
+    if (!mounted) return;
+    context.go(done ? '/cars' : '/onboarding');
+    // Fire-and-forget: request permissions then reschedule all notifications
+    unawaited(_initNotifications());
+  }
+
+  Future<void> _initNotifications() async {
+    await NotificationService.instance.requestPermissions();
+    final prefs = await SharedPreferences.getInstance();
+    await NotificationService.instance.rescheduleAll(prefs);
   }
 
   @override
@@ -63,48 +77,51 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F0F14),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ScaleTransition(
-              scale: _scale,
-              child: FadeTransition(
-                opacity: _fade,
-                child: Hero(
-                  tag: 'app_logo',
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(22),
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      width: 88,
-                      height: 88,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: const Color(0xFF0F0F14),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ScaleTransition(
+                scale: _scale,
+                child: FadeTransition(
+                  opacity: _fade,
+                  child: Hero(
+                    tag: 'app_logo',
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(22),
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: 88,
+                        height: 88,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            FadeTransition(
-              opacity: _textFade,
-              child: const Column(
-                children: [
-                  Text(
-                    'BnGarage',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 26,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.2,
+              const SizedBox(height: 20),
+              FadeTransition(
+                opacity: _textFade,
+                child: const Column(
+                  children: [
+                    Text(
+                      'BnGarage',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 26,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.2,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 5),
-                ],
+                    SizedBox(height: 5),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

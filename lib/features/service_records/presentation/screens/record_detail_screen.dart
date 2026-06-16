@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/services/notification_service.dart';
 import '../../../../core/utils/date_utils.dart';
 import '../../../../core/utils/mileage_utils.dart';
 import '../../data/models/service_record_model.dart';
@@ -258,6 +259,8 @@ class _RecordDetailScreenState extends ConsumerState<RecordDetailScreen>
                               Navigator.pop(ctx);
                               final carId = GoRouterState.of(context)
                                   .pathParameters['carId']!;
+                              await NotificationService.instance
+                                  .cancelForRecord(record.id);
                               await ref
                                   .read(serviceRecordRepositoryProvider)
                                   .deleteRecord(record.id);

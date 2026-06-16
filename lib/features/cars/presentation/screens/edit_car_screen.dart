@@ -1,12 +1,17 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/database/database_helper.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/services/notification_service.dart';
 import '../../../../core/utils/date_utils.dart';
 import '../../../../core/utils/photo_helper.dart';
+import '../../../service_records/data/models/service_record_model.dart';
 import '../../data/models/car_model.dart';
 import '../providers/cars_provider.dart';
 
@@ -20,6 +25,7 @@ IconData _fuelIcon(String key) => switch (key) {
   'diesel'   => Icons.opacity,
   'electric' => Icons.bolt_rounded,
   'hybrid'   => Icons.eco_rounded,
+  'gas'      => Icons.bubble_chart_rounded,
   _          => Icons.help_outline_rounded,
 };
 
@@ -28,6 +34,7 @@ Color _fuelColor(String key) => switch (key) {
   'diesel'   => const Color(0xFF94A3B8),
   'electric' => const Color(0xFF22D3EE),
   'hybrid'   => const Color(0xFF10B981),
+  'gas'      => const Color(0xFF8B5CF6),
   _          => const Color(0xFF6B7280),
 };
 
@@ -46,7 +53,6 @@ class _EditCarScreenState extends ConsumerState<EditCarScreen> {
   late final TextEditingController _modelCtrl;
   late final TextEditingController _yearCtrl;
   late final TextEditingController _mileageCtrl;
-  late final TextEditingController _vinCtrl;
   late final TextEditingController _colorCtrl;
   late final TextEditingController _tintCtrl;
   late String    _fuelType;
@@ -64,7 +70,6 @@ class _EditCarScreenState extends ConsumerState<EditCarScreen> {
     _modelCtrl    = TextEditingController(text: c.model);
     _yearCtrl     = TextEditingController(text: c.year.toString());
     _mileageCtrl  = TextEditingController(text: c.mileage.toString());
-    _vinCtrl      = TextEditingController(text: c.vin ?? '');
     _colorCtrl    = TextEditingController(text: c.color ?? '');
     _tintCtrl     = TextEditingController(
       text: c.tintPercent != null ? c.tintPercent.toString() : '',
@@ -82,7 +87,6 @@ class _EditCarScreenState extends ConsumerState<EditCarScreen> {
     _modelCtrl.dispose();
     _yearCtrl.dispose();
     _mileageCtrl.dispose();
-    _vinCtrl.dispose();
     _colorCtrl.dispose();
     _tintCtrl.dispose();
     super.dispose();
@@ -200,7 +204,7 @@ class _EditCarScreenState extends ConsumerState<EditCarScreen> {
         mileage:      int.parse(_mileageCtrl.text.trim()),
         fuelType:     _fuelType,
         transmission: _transmission,
-        vin:   _vinCtrl.text.trim().isEmpty ? null : _vinCtrl.text.trim(),
+        vin: null,
         color: _colorCtrl.text.trim().isEmpty ? null : _colorCtrl.text.trim(),
         hasTint:    _hasTint,
         tintPercent: _hasTint ? int.tryParse(_tintCtrl.text.trim()) : null,
@@ -209,6 +213,25 @@ class _EditCarScreenState extends ConsumerState<EditCarScreen> {
       );
       await ref.read(carRepositoryProvider).updateCar(updated);
       ref.invalidate(carsProvider);
+
+      // Check mileage notifications after mileage may have changed
+      final prefs = await SharedPreferences.getInstance();
+      final lang = prefs.getString('locale') ?? 'ru';
+      final carName = '${updated.brand} ${updated.model}';
+      final db = await DatabaseHelper.instance.database;
+      final maps = await db.query(
+        'service_records',
+        where: 'car_id = ?',
+        whereArgs: [updated.id],
+      );
+      final ns = NotificationService.instance;
+      for (final m in maps) {
+        final record = ServiceRecordModel.fromMap(m);
+        if (record.nextMileage != null) {
+          await ns.checkMileageNotification(carName, updated, record, prefs, lang);
+        }
+      }
+
       if (mounted) context.pop();
     } catch (e) {
       if (mounted) {
@@ -297,9 +320,11 @@ class _EditCarScreenState extends ConsumerState<EditCarScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = context.l10n;
 
-    return Scaffold(
-      backgroundColor: isDark ? _kDarkBg : const Color(0xFFF1F5F9),
-      appBar: _EditAppBar(car: widget.car, l10n: l10n),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: isDark ? _kDarkBg : const Color(0xFFF1F5F9),
+        appBar: _EditAppBar(car: widget.car, l10n: l10n),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -424,17 +449,6 @@ class _EditCarScreenState extends ConsumerState<EditCarScreen> {
                   ),
                   const SizedBox(height: 14),
                   TextFormField(
-                    controller: _vinCtrl,
-                    style: _inputStyle(isDark),
-                    decoration: _dec(
-                      l10n.carVinOptional,
-                      icon: Icons.fingerprint_rounded,
-                      isDark: isDark,
-                    ),
-                    textCapitalization: TextCapitalization.characters,
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
                     controller: _colorCtrl,
                     style: _inputStyle(isDark),
                     decoration: _dec(
@@ -540,6 +554,7 @@ class _EditCarScreenState extends ConsumerState<EditCarScreen> {
             _SaveButton(isLoading: _isLoading, onTap: _save, l10n: l10n),
           ],
         ),
+      ),
       ),
     );
   }
@@ -887,9 +902,9 @@ class _FuelSelector extends StatelessWidget {
     final entries = l10n.fuelTypeLabels.entries.toList();
     return Column(
       children: [
-        Row(children: entries.sublist(0, 2).map(_item).toList()),
+        Row(children: entries.sublist(0, 3).map(_item).toList()),
         const SizedBox(height: 8),
-        Row(children: entries.sublist(2).map(_item).toList()),
+        Row(children: entries.sublist(3).map(_item).toList()),
       ],
     );
   }
