@@ -4,114 +4,369 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BnGarage — Политика конфиденциальности</title>
+  <meta name="description" content="Политика конфиденциальности приложения BnGarage." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&display=swap" rel="stylesheet">
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #000000;
+      --card:     rgba(255,255,255,0.035);
+      --card-h:   rgba(255,255,255,0.06);
+      --border:   rgba(255,255,255,0.08);
+      --border-2: rgba(255,255,255,0.14);
+      --blue:     #185FA5;
+      --blue-2:   #2E86D4;
+      --cyan:     #22D3EE;
+      --white:    #FFFFFF;
+      --muted:    rgba(255,255,255,0.55);
+      --faint:    rgba(255,255,255,0.28);
+      --font:     'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f5f5f7;
-      color: #1d1d1f;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--white);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
-    header {
-      background: #1d1d1f;
-      color: #fff;
-      padding: 40px 20px;
-      text-align: center;
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0;
+      margin: -1px; overflow: hidden; clip: rect(0,0,0,0);
+      white-space: nowrap; border-width: 0;
     }
-    header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
-    header p { font-size: 0.95rem; color: #a1a1a6; }
-    .container { max-width: 720px; margin: 0 auto; padding: 40px 20px; }
-    .card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 28px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
+    /* Ambient */
+    .ambient { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .ab {
+      position: absolute; border-radius: 50%; filter: blur(90px);
+      animation: drift 12s ease-in-out infinite;
     }
-    .card h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; color: #1d1d1f; }
-    .card p, .card li { font-size: 0.95rem; color: #3d3d3f; line-height: 1.7; }
-    .card ul { padding-left: 20px; margin-top: 8px; }
-    .card ul li { margin-bottom: 6px; }
+    .ab-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(24,95,165,.18) 0%, transparent 70%);
+      top: -200px; right: -100px;
+    }
+    .ab-2 {
+      width: 380px; height: 380px;
+      background: radial-gradient(circle, rgba(34,211,238,.07) 0%, transparent 70%);
+      bottom: 25%; left: -80px;
+      animation-delay: -6s; animation-direction: reverse;
+    }
+    @keyframes drift {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-20px); }
+    }
+
+    /* Nav */
+    .nav {
+      position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+      z-index: 100; width: calc(100% - 32px); max-width: 1120px;
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 18px;
+      background: rgba(4,4,4,.72);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border); border-radius: 15px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+    .nav-mark { width: 30px; height: 30px; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+    .nav-mark img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .nav-name { font-size: 16px; font-weight: 700; color: var(--white); }
+    .nav-pill {
+      display: flex; align-items: center; gap: 7px;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, var(--blue-2), var(--blue));
+      color: white; border-radius: 9px; text-decoration: none;
+      font-size: 13px; font-weight: 600;
+      transition: opacity .2s, transform .2s; cursor: pointer; white-space: nowrap;
+    }
+    .nav-pill:hover { opacity: .85; transform: translateY(-1px); }
+
+    /* Layout */
+    .container { max-width: 760px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+    /* Page hero */
+    .page-hero {
+      padding: 140px 0 60px; text-align: center; position: relative; z-index: 1;
+    }
+    .page-hero-logo {
+      width: 72px; height: 72px; border-radius: 18px; overflow: hidden;
+      margin: 0 auto 20px; border: 1px solid var(--border-2);
+      box-shadow: 0 12px 32px rgba(24,95,165,.25);
+    }
+    .page-hero-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .page-hero h1 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 900; letter-spacing: -.4px; margin-bottom: 12px;
+    }
+    .page-hero p { font-size: 1rem; color: var(--muted); line-height: 1.7; }
+    .grad {
+      background: linear-gradient(135deg, #fff 25%, var(--cyan) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* Divider */
+    .divider { height: 1px; background: var(--border); position: relative; z-index: 1; }
+
+    /* Content */
+    .content { padding: 48px 0 80px; position: relative; z-index: 1; }
+
+    /* Back link */
     .back-link {
-      display: inline-block;
-      margin-bottom: 24px;
-      color: #0071e3;
-      text-decoration: none;
-      font-size: 0.95rem;
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--cyan); text-decoration: none;
+      font-size: 13.5px; font-weight: 500;
+      margin-bottom: 28px;
+      transition: opacity .2s;
     }
-    footer {
-      text-align: center;
-      padding: 30px 20px;
-      font-size: 0.85rem;
-      color: #6e6e73;
+    .back-link:hover { opacity: .75; }
+
+    /* Cards */
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 18px; padding: 26px 28px; margin-bottom: 12px;
+      transition: background .25s, border-color .25s;
     }
-    footer a { color: #0071e3; text-decoration: none; }
+    .card:hover { background: var(--card-h); border-color: var(--border-2); }
+    .card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .card-num {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--blue-2), var(--blue));
+      display: grid; place-items: center;
+      font-size: 12px; font-weight: 800; color: white; flex-shrink: 0;
+    }
+    .card h2 { font-size: 15px; font-weight: 700; color: var(--white); }
+    .card p { font-size: 14.5px; color: var(--muted); line-height: 1.75; }
+    .card p + p { margin-top: 10px; }
+    .card ul { padding-left: 0; list-style: none; margin-top: 8px; }
+    .card ul li {
+      font-size: 14.5px; color: var(--muted); line-height: 1.72;
+      padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.04);
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .card ul li:last-child { border-bottom: none; padding-bottom: 0; }
+    .li-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--cyan); flex-shrink: 0; margin-top: 9px; }
+    .card strong { color: var(--white); font-weight: 600; }
+    .card a { color: var(--cyan); text-decoration: none; }
+    .card a:hover { text-decoration: underline; }
+
+    /* Updated date badge */
+    .updated-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(34,211,238,.07); color: var(--cyan);
+      border: 1px solid rgba(34,211,238,.2); border-radius: 100px;
+      padding: 5px 13px; font-size: 12px; font-weight: 500;
+      margin-bottom: 22px; letter-spacing: .3px;
+    }
+
+    /* Reveal */
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
+    .reveal.in { opacity: 1; transform: none; }
+    .d1 { transition-delay: .05s; }
+    .d2 { transition-delay: .1s; }
+    .d3 { transition-delay: .15s; }
+
+    /* Footer */
+    footer { border-top: 1px solid var(--border); padding: 36px 0; position: relative; z-index: 1; }
+    .foot-inner {
+      max-width: 1120px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px;
+    }
+    .foot-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .foot-mark { width: 26px; height: 26px; border-radius: 7px; overflow: hidden; flex-shrink: 0; }
+    .foot-mark img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .foot-name { font-size: 14px; font-weight: 700; color: var(--muted); }
+    .foot-links { display: flex; gap: 22px; }
+    .foot-links a { font-size: 13.5px; color: var(--faint); text-decoration: none; transition: color .2s; }
+    .foot-links a:hover { color: var(--muted); }
+    .foot-copy { font-size: 13px; color: var(--faint); }
+
+    @media (max-width: 600px) {
+      .nav-pill { display: none; }
+      .card { padding: 20px 18px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .ab { animation: none; }
+    }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>Политика конфиденциальности</h1>
-  <p>BnGarage &nbsp;|&nbsp; Последнее обновление: декабрь 2024</p>
-</header>
-
-<div class="container">
-
-  <a class="back-link" href="index.html">← Назад к поддержке</a>
-
-  <div class="card">
-    <h2>1. Общие положения</h2>
-    <p>Настоящая Политика конфиденциальности описывает, как приложение BnGarage обрабатывает информацию пользователей. Мы уважаем вашу конфиденциальность и стремимся защитить ваши личные данные.</p>
-  </div>
-
-  <div class="card">
-    <h2>2. Сбор данных</h2>
-    <p>BnGarage <strong>не собирает и не передаёт</strong> персональные данные на внешние серверы. Все данные, которые вы вводите в приложение (автомобили, записи об обслуживании, напоминания), хранятся исключительно на вашем устройстве в локальной базе данных.</p>
-  </div>
-
-  <div class="card">
-    <h2>3. Разрешения приложения</h2>
-    <ul>
-      <li><strong>Камера</strong> — используется только для фотографирования автомобиля. Фото хранятся на вашем устройстве.</li>
-      <li><strong>Галерея (Фото)</strong> — используется для выбора изображения из библиотеки фотографий. Доступ к другим файлам не запрашивается.</li>
-      <li><strong>Уведомления</strong> — используются для отправки напоминаний о ТО и страховке. Уведомления формируются локально, без подключения к интернету.</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <h2>4. Передача данных третьим лицам</h2>
-    <p>Мы не продаём, не обмениваем и не передаём ваши данные третьим лицам. Приложение не требует регистрации и не имеет учётных записей пользователей.</p>
-  </div>
-
-  <div class="card">
-    <h2>5. Аналитика</h2>
-    <p>Приложение использует Firebase для базовой диагностики сбоев (crash reporting). Эти данные анонимны и не содержат личной информации. Они используются исключительно для улучшения стабильности приложения.</p>
-  </div>
-
-  <div class="card">
-    <h2>6. Хранение данных</h2>
-    <p>Все пользовательские данные хранятся локально на вашем устройстве. При удалении приложения все данные удаляются вместе с ним. Мы рекомендуем регулярно создавать резервные копии через стандартные средства iOS (iCloud/iTunes) или Android (Google Drive).</p>
-  </div>
-
-  <div class="card">
-    <h2>7. Дети</h2>
-    <p>Приложение не предназначено для детей младше 4 лет и не собирает данные о детях намеренно.</p>
-  </div>
-
-  <div class="card">
-    <h2>8. Изменения политики</h2>
-    <p>Мы оставляем за собой право обновлять данную политику. Об изменениях мы будем уведомлять через обновление приложения. Дата последнего изменения указана в заголовке страницы.</p>
-  </div>
-
-  <div class="card">
-    <h2>9. Контакты</h2>
-    <p>По вопросам конфиденциальности обращайтесь: <a href="mailto:bnutssdev@gmail.com">bnutssdev@gmail.com</a></p>
-  </div>
-
+<div class="ambient" aria-hidden="true">
+  <div class="ab ab-1"></div>
+  <div class="ab ab-2"></div>
 </div>
 
+<!-- Nav -->
+<nav class="nav" aria-label="Навигация">
+  <div class="nav-inner">
+    <a href="marketing.html" class="nav-logo" aria-label="BnGarage — главная">
+      <div class="nav-mark" aria-hidden="true"><img src="logo.png" alt=""></div>
+      <span class="nav-name">BnGarage</span>
+    </a>
+    <a href="marketing.html#download" class="nav-pill" aria-label="Скачать приложение">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Скачать
+    </a>
+  </div>
+</nav>
+
+<!-- Page hero -->
+<div class="page-hero">
+  <div class="container">
+    <div class="page-hero-logo">
+      <img src="logo.png" alt="BnGarage логотип">
+    </div>
+    <h1><span class="grad">Конфиденциальность</span></h1>
+    <p>Политика конфиденциальности приложения BnGarage</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Content -->
+<div class="content">
+  <div class="container">
+
+    <a class="back-link" href="index.html" aria-label="Назад к поддержке">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Назад к поддержке
+    </a>
+
+    <div class="updated-badge" aria-label="Последнее обновление: декабрь 2024">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </svg>
+      Последнее обновление: декабрь 2024
+    </div>
+
+    <div class="card reveal d1">
+      <div class="card-head">
+        <div class="card-num" aria-hidden="true">1</div>
+        <h2>Общие положения</h2>
+      </div>
+      <p>Настоящая Политика конфиденциальности описывает, как приложение BnGarage обрабатывает информацию пользователей. Мы уважаем вашу конфиденциальность и стремимся защитить ваши личные данные.</p>
+    </div>
+
+    <div class="card reveal d2">
+      <div class="card-head">
+        <div class="card-num" aria-hidden="true">2</div>
+        <h2>Сбор данных</h2>
+      </div>
+      <p>BnGarage <strong>не собирает и не передаёт</strong> персональные данные на внешние серверы. Все данные, которые вы вводите в приложение (автомобили, записи об обслуживании, напоминания), хранятся исключительно на вашем устройстве в локальной базе данных.</p>
+    </div>
+
+    <div class="card reveal d3">
+      <div class="card-head">
+        <div class="card-num" aria-hidden="true">3</div>
+        <h2>Разрешения приложения</h2>
+      </div>
+      <ul>
+        <li>
+          <span class="li-dot" aria-hidden="true"></span>
+          <span><strong>Камера</strong> — используется только для фотографирования автомобиля. Фото хранятся на вашем устройстве.</span>
+        </li>
+        <li>
+          <span class="li-dot" aria-hidden="true"></span>
+          <span><strong>Галерея (Фото)</strong> — используется для выбора изображения из библиотеки. Доступ к другим файлам не запрашивается.</span>
+        </li>
+        <li>
+          <span class="li-dot" aria-hidden="true"></span>
+          <span><strong>Уведомления</strong> — используются для отправки напоминаний о ТО. Уведомления формируются локально, без подключения к интернету.</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card reveal d1">
+      <div class="card-head">
+        <div class="card-num" aria-hidden="true">4</div>
+        <h2>Передача данных третьим лицам</h2>
+      </div>
+      <p>Мы не продаём, не обмениваем и не передаём ваши данные третьим лицам. Приложение не требует регистрации и не имеет учётных записей пользователей.</p>
+    </div>
+
+    <div class="card reveal d2">
+      <div class="card-head">
+        <div class="card-num" aria-hidden="true">5</div>
+        <h2>Аналитика</h2>
+      </div>
+      <p>Приложение использует Firebase для базовой диагностики сбоев (crash reporting). Эти данные анонимны и не содержат личной информации. Они используются исключительно для улучшения стабильности приложения.</p>
+    </div>
+
+    <div class="card reveal d3">
+      <div class="card-head">
+        <div class="card-num" aria-hidden="true">6</div>
+        <h2>Хранение данных</h2>
+      </div>
+      <p>Все пользовательские данные хранятся локально на вашем устройстве. При удалении приложения все данные удаляются вместе с ним.</p>
+      <p>Мы рекомендуем регулярно создавать резервные копии через стандартные средства iOS (iCloud / Finder) или Android (Google Drive).</p>
+    </div>
+
+    <div class="card reveal d1">
+      <div class="card-head">
+        <div class="card-num" aria-hidden="true">7</div>
+        <h2>Дети</h2>
+      </div>
+      <p>Приложение не предназначено для детей младше 4 лет и не собирает данные о детях намеренно.</p>
+    </div>
+
+    <div class="card reveal d2">
+      <div class="card-head">
+        <div class="card-num" aria-hidden="true">8</div>
+        <h2>Изменения политики</h2>
+      </div>
+      <p>Мы оставляем за собой право обновлять данную политику. Об изменениях мы будем уведомлять через обновление приложения. Дата последнего изменения указана в верхней части страницы.</p>
+    </div>
+
+    <div class="card reveal d3">
+      <div class="card-head">
+        <div class="card-num" aria-hidden="true">9</div>
+        <h2>Контакты</h2>
+      </div>
+      <p>По вопросам конфиденциальности обращайтесь: <a href="mailto:bnutssdev@gmail.com">bnutssdev@gmail.com</a></p>
+    </div>
+
+  </div>
+</div>
+
+<!-- Footer -->
 <footer>
-  <p>&copy; 2024 BnGarage &nbsp;|&nbsp; <a href="index.html">Поддержка</a></p>
+  <div class="foot-inner">
+    <a href="marketing.html" class="foot-logo" aria-label="BnGarage">
+      <div class="foot-mark" aria-hidden="true"><img src="logo.png" alt=""></div>
+      <span class="foot-name">BnGarage</span>
+    </a>
+    <nav class="foot-links" aria-label="Ссылки в подвале">
+      <a href="index.html">Поддержка</a>
+      <a href="marketing.html">О приложении</a>
+      <a href="mailto:bnutssdev@gmail.com">Контакты</a>
+    </nav>
+    <p class="foot-copy">&copy; 2025 BnGarage</p>
+  </div>
 </footer>
+
+<script>
+  const io = new IntersectionObserver(
+    es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }),
+    { threshold: 0.1, rootMargin: '0px 0px -24px 0px' }
+  );
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
 
 </body>
 </html>
