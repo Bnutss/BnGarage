@@ -128,11 +128,14 @@
     }
     .nav-logo-mark {
       width: 30px; height: 30px;
-      background: linear-gradient(135deg, var(--blue-2), var(--blue));
       border-radius: 8px;
-      display: grid;
-      place-items: center;
+      overflow: hidden;
       flex-shrink: 0;
+    }
+    .nav-logo-mark img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
     }
     .nav-logo-name {
       font-size: 16px;
@@ -324,8 +327,14 @@
     }
     .ui-logo {
       width: 22px; height: 22px;
-      background: linear-gradient(135deg, #2E86D4, #185FA5);
       border-radius: 5px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .ui-logo img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
     }
     .ui-title { font-size: 12.5px; font-weight: 800; color: white; }
     .ui-badge {
@@ -728,9 +737,14 @@
     }
     .foot-mark {
       width: 26px; height: 26px;
-      background: linear-gradient(135deg, var(--blue-2), var(--blue));
       border-radius: 7px;
+      overflow: hidden;
       flex-shrink: 0;
+    }
+    .foot-mark img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
     }
     .foot-name { font-size: 14px; font-weight: 700; color: var(--muted); }
     .foot-links { display: flex; gap: 22px; }
@@ -799,12 +813,7 @@
   <div class="nav-inner">
     <a href="#" class="nav-logo" aria-label="BnGarage — главная">
       <div class="nav-logo-mark" aria-hidden="true">
-        <!-- car icon -->
-        <svg width="16" height="12" viewBox="0 0 20 14" fill="none" aria-hidden="true">
-          <path d="M3 7L9.5 1.5H10.5L17 7V12.5H13.5V9H6.5V12.5H3V7Z" fill="white" opacity=".9"/>
-          <circle cx="6.5" cy="12.5" r="1.5" fill="white" opacity=".6"/>
-          <circle cx="13.5" cy="12.5" r="1.5" fill="white" opacity=".6"/>
-        </svg>
+        <img src="logo.png" alt="">
       </div>
       <span class="nav-logo-name">BnGarage</span>
     </a>
@@ -879,7 +888,7 @@
 
             <!-- App header -->
             <div class="ui-header">
-              <div class="ui-logo"></div>
+              <div class="ui-logo"><img src="logo.png" alt=""></div>
               <span class="ui-title">BnGarage</span>
               <div class="ui-badge">2 авто</div>
             </div>
@@ -1150,7 +1159,7 @@
   <div class="container">
     <div class="foot-inner">
       <a href="index.html" class="foot-logo" aria-label="BnGarage">
-        <div class="foot-mark" aria-hidden="true"></div>
+        <div class="foot-mark" aria-hidden="true"><img src="logo.png" alt=""></div>
         <span class="foot-name">BnGarage</span>
       </a>
       <nav class="foot-links" aria-label="Ссылки в подвале">
