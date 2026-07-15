@@ -8,6 +8,7 @@ import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/services/notification_service.dart';
 import '../../../../core/utils/date_utils.dart';
 import '../../../../core/utils/mileage_utils.dart';
+import '../../../cars/presentation/providers/cars_provider.dart';
 import '../../data/models/service_record_model.dart';
 import '../providers/service_records_provider.dart';
 
@@ -267,6 +268,7 @@ class _RecordDetailScreenState extends ConsumerState<RecordDetailScreen>
                               ref.invalidate(
                                 serviceRecordsProvider(carId),
                               );
+                              ref.invalidate(carsProvider);
                               if (context.mounted) context.pop();
                             },
                           child: Container(

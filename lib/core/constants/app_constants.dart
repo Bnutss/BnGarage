@@ -13,6 +13,17 @@ class ServiceCategory {
 }
 
 class AppConstants {
+  // Backend base URL for Telegram login + cloud backup/restore.
+  // Defaults to production so release builds (Xcode/TestFlight/App Store —
+  // anything not launched via `flutter run --dart-define=...`) work without
+  // extra config. For local backend dev, override explicitly, e.g.:
+  //   flutter run --dart-define=API_BASE_URL=http://127.0.0.1:8000   (iOS simulator)
+  //   flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000    (Android emulator)
+  static const String apiBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'https://timoda.uz',
+  );
+
   static const List<ServiceCategory> serviceCategories = [
     ServiceCategory(key: 'oil', label: 'Масло', icon: Icons.opacity),
     ServiceCategory(key: 'brakes', label: 'Тормоза', icon: Icons.disc_full),

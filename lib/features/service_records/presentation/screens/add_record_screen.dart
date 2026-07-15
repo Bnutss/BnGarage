@@ -9,6 +9,7 @@ import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/services/notification_service.dart';
 import '../../../../core/utils/date_utils.dart';
 import '../../../cars/data/models/car_model.dart';
+import '../../../cars/presentation/providers/cars_provider.dart';
 import '../../data/models/service_record_model.dart';
 import '../providers/service_records_provider.dart';
 
@@ -96,6 +97,9 @@ class _AddRecordScreenState extends ConsumerState<AddRecordScreen> {
           .read(serviceRecordRepositoryProvider)
           .addRecord(widget.car.id, record);
       ref.invalidate(serviceRecordsProvider(widget.car.id));
+      // Also invalidate carsProvider so the auto-backup coordinator (which
+      // only watches carsProvider) picks up this change too.
+      ref.invalidate(carsProvider);
 
       // Schedule notifications for the new record
       final prefs = await SharedPreferences.getInstance();

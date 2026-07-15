@@ -477,6 +477,7 @@ class CarDetailScreen extends ConsumerWidget {
           .read(serviceRecordRepositoryProvider)
           .deleteRecord(record.id);
       ref.invalidate(serviceRecordsProvider(car.id));
+      ref.invalidate(carsProvider);
       return true;
     }
     return false;

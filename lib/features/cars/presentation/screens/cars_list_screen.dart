@@ -54,7 +54,7 @@ class CarsListScreen extends ConsumerWidget {
         body: carsAsync.when(
           data: (cars) {
             if (cars.isEmpty) {
-              return _EmptyState(onAddTap: () => context.push('/cars/add'));
+              return const _EmptyState();
             }
             return _CarsCarousel(cars: cars);
           },
@@ -194,11 +194,8 @@ class _CarsCarouselState extends State<_CarsCarousel> {
               controller: _pageCtrl,
               itemCount: widget.cars.length,
               onPageChanged: (i) => setState(() => _current = i),
-              itemBuilder: (ctx, i) => _CarCard(
-                car: widget.cars[i],
-                index: i,
-                l10n: context.l10n,
-              ),
+              itemBuilder: (ctx, i) =>
+                  _CarCard(car: widget.cars[i], index: i, l10n: context.l10n),
             ),
           ),
           const SizedBox(height: 20),
@@ -231,9 +228,7 @@ class _PageDots extends StatelessWidget {
           width: active ? 22 : 6,
           height: 6,
           decoration: BoxDecoration(
-            color: active
-                ? _kCyan
-                : Colors.white.withValues(alpha: 0.18),
+            color: active ? _kCyan : Colors.white.withValues(alpha: 0.18),
             borderRadius: BorderRadius.circular(3),
             boxShadow: active
                 ? [
@@ -327,14 +322,14 @@ class _CarCardState extends ConsumerState<_CarCard>
     final glowColor = hasOverdue
         ? _kOverdue.withValues(alpha: 0.25)
         : hasSoon
-            ? _kSoon.withValues(alpha: 0.2)
-            : _kPrimary.withValues(alpha: 0.2);
+        ? _kSoon.withValues(alpha: 0.2)
+        : _kPrimary.withValues(alpha: 0.2);
 
     final borderColor = hasOverdue
         ? _kOverdue.withValues(alpha: 0.55)
         : hasSoon
-            ? _kSoon.withValues(alpha: 0.55)
-            : Colors.white.withValues(alpha: 0.1);
+        ? _kSoon.withValues(alpha: 0.55)
+        : Colors.white.withValues(alpha: 0.1);
 
     return FadeTransition(
       opacity: _fade,
@@ -457,17 +452,22 @@ class _CarCardState extends ConsumerState<_CarCard>
                           const SizedBox(height: 10),
                           // Stats row
                           Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              _StatChip(
-                                icon: _fuelIcon(car.fuelType),
-                                label: l10n.fuelLabelRaw(car.fuelType),
+                              Flexible(
+                                child: _StatChip(
+                                  icon: _fuelIcon(car.fuelType),
+                                  label: l10n.fuelLabelRaw(car.fuelType),
+                                ),
                               ),
                               const SizedBox(width: 7),
-                              _StatChip(
-                                icon: _isAuto(car.transmission)
-                                    ? Icons.settings_backup_restore
-                                    : Icons.tune,
-                                label: l10n.transmissionLabel(car.transmission),
+                              Flexible(
+                                child: _StatChip(
+                                  icon: _isAuto(car.transmission)
+                                      ? Icons.settings_backup_restore
+                                      : Icons.tune,
+                                  label: l10n.transmissionLabel(car.transmission),
+                                ),
                               ),
                               const Spacer(),
                               Column(
@@ -479,6 +479,7 @@ class _CarCardState extends ConsumerState<_CarCard>
                                       car.mileage,
                                       l10n.langCode,
                                     ),
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 14,
@@ -488,8 +489,11 @@ class _CarCardState extends ConsumerState<_CarCard>
                                   const SizedBox(height: 2),
                                   Text(
                                     l10n.yearDisplay(car.year),
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.42),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.42,
+                                      ),
                                       fontSize: 11,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -533,12 +537,16 @@ class _StatChip extends StatelessWidget {
         children: [
           Icon(icon, size: 11, color: Colors.white70),
           const SizedBox(width: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.75),
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
+          Flexible(
+            child: Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.75),
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],
@@ -567,7 +575,8 @@ class _CardVisual extends StatelessWidget {
       return Image.file(
         File(car.photoUrl!),
         fit: BoxFit.cover,
-        errorBuilder: (context, e, _) => _GradientVisual(car: car, seed: _seed()),
+        errorBuilder: (context, e, _) =>
+            _GradientVisual(car: car, seed: _seed()),
       );
     }
     return _GradientVisual(car: car, seed: _seed());
@@ -750,9 +759,7 @@ class _StatusPillState extends State<_StatusPill>
 
 // ─── Empty State ─────────────────────────────────────────────────────────────
 class _EmptyState extends StatefulWidget {
-  final VoidCallback onAddTap;
-
-  const _EmptyState({required this.onAddTap});
+  const _EmptyState();
 
   @override
   State<_EmptyState> createState() => _EmptyStateState();
@@ -844,44 +851,6 @@ class _EmptyStateState extends State<_EmptyState>
                 color: isDark
                     ? Colors.white.withValues(alpha: 0.35)
                     : const Color(0xFF94A3B8),
-              ),
-            ),
-            const SizedBox(height: 28),
-            GestureDetector(
-              onTap: widget.onAddTap,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 13,
-                ),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [_kPriLight, _kPrimary],
-                  ),
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: _kPrimary.withValues(alpha: 0.4),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.add, color: Colors.white, size: 18),
-                    const SizedBox(width: 7),
-                    Text(
-                      context.l10n.carsAddFab,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ),
           ],

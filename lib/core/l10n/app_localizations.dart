@@ -215,6 +215,24 @@ class AppLocalizations {
   String get settingsLangRu      => _s('settings_lang_ru');
   String get settingsLangEn      => _s('settings_lang_en');
   String get settingsLangUz      => _s('settings_lang_uz');
+  String get settingsAccount     => _s('settings_account');
+
+  // ── Account / Telegram ──────────────────────────────────────────────────────
+  String get accountConnectTelegram    => _s('account_connect_telegram');
+  String get accountTryAgain           => _s('account_try_again');
+  String get accountLoginError         => _s('account_login_error');
+  String get accountBackupNow          => _s('account_backup_now');
+  String get accountRestore            => _s('account_restore');
+  String get accountSignOut            => _s('account_sign_out');
+  String get accountBackupConfirmTitle => _s('account_backup_confirm_title');
+  String get accountBackupConfirmBody  => _s('account_backup_confirm_body');
+  String get accountRestoreConfirmTitle => _s('account_restore_confirm_title');
+  String get accountRestoreConfirmBody  => _s('account_restore_confirm_body');
+  String get accountBackupSuccess      => _s('account_backup_success');
+  String get accountRestoreSuccess     => _s('account_restore_success');
+  String get accountSyncError          => _s('account_sync_error');
+  String get accountSignOutConfirmTitle => _s('account_sign_out_confirm_title');
+  String get accountSignOutConfirmBody  => _s('account_sign_out_confirm_body');
 
   // ── Parametric ──────────────────────────────────────────────────────────────
   String overdueByDays(int n) {

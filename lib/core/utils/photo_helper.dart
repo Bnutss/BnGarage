@@ -25,4 +25,17 @@ class PhotoHelper {
     final file = File(path);
     if (await file.exists()) await file.delete();
   }
+
+  /// Writes raw bytes (e.g. downloaded from a cloud restore) into the same
+  /// car_photos directory used by [pickAndSave], returning the local path.
+  static Future<String> saveBytes(List<int> bytes, {String ext = '.jpg'}) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final photosDir = Directory('${dir.path}/car_photos');
+    if (!await photosDir.exists()) await photosDir.create(recursive: true);
+
+    final normalizedExt = ext.startsWith('.') ? ext : '.$ext';
+    final savedPath = '${photosDir.path}/${const Uuid().v4()}$normalizedExt';
+    await File(savedPath).writeAsBytes(bytes);
+    return savedPath;
+  }
 }

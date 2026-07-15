@@ -8,6 +8,7 @@ import '../../../../core/utils/date_utils.dart';
 import '../../../../core/utils/mileage_utils.dart';
 import '../../data/models/service_record_model.dart';
 import '../../../cars/data/models/car_model.dart';
+import '../../../cars/presentation/providers/cars_provider.dart';
 import '../providers/service_records_provider.dart';
 
 const _kPrimary = Color(0xFF185FA5);
@@ -511,6 +512,7 @@ class _CategorySectionState extends ConsumerState<_CategorySection>
           .read(serviceRecordRepositoryProvider)
           .deleteRecord(record.id);
       ref.invalidate(serviceRecordsProvider(widget.car.id));
+      ref.invalidate(carsProvider);
       return true;
     }
     return false;

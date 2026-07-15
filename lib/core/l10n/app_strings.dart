@@ -167,15 +167,74 @@ class AppStrings {
       'settings_privacy': 'Политика конфиденциальности',
       'settings_version': 'Версия приложения',
       'settings_privacy_text':
-          'Все данные об автомобилях и записях хранятся '
-          'локально на вашем устройстве и не загружаются '
-          'на внешние серверы.\n\n'
-          'Приложение не собирает персональные данные '
-          'и не требует регистрации.',
+          'BnGarage уважает вашу приватность.\n\n'
+          '1. Сбор данных\n'
+          'По умолчанию приложение НЕ собирает персональных данных, '
+          'аналитики, файлов cookie и идентификаторов устройств и '
+          'работает полностью локально. Если вы самостоятельно и добровольно '
+          'входите через Telegram, мы получаем от Telegram ваш ID, '
+          'username, имя, фамилию и ссылку на фото профиля — '
+          'только для идентификации вашего аккаунта.\n\n'
+          '2. Хранение данных\n'
+          'Без входа через Telegram все данные — автомобили, записи '
+          'о техобслуживании, напоминания и фотографии — хранятся '
+          'исключительно локально на вашем устройстве и никуда не '
+          'отправляются. После входа через Telegram эти же данные '
+          'дополнительно резервно копируются на наш сервер (по '
+          'зашифрованному соединению) — это нужно, чтобы не потерять их '
+          'при смене или сбросе устройства.\n\n'
+          '3. Резервное копирование и Telegram\n'
+          'Вход через Telegram полностью добровольный — без него '
+          'приложение работает так же, как описано в пункте 2. После '
+          'входа резервное копирование запускается автоматически при '
+          'изменении данных, а также вручную кнопкой «Сохранить в '
+          'облако». Восстановить данные на новом устройстве можно '
+          'кнопкой «Восстановить из облака». Выйти из аккаунта и '
+          'запросить удаление данных с сервера можно в любой момент.\n\n'
+          '4. Фотографии\n'
+          'Фотографии автомобилей сохраняются в памяти приложения и '
+          '(при включённом входе через Telegram) в резервной копии на '
+          'сервере. Мы не передаём их третьим лицам.\n\n'
+          '5. Уведомления\n'
+          'Напоминания о техобслуживании обрабатываются локально на '
+          'устройстве. Push-уведомления отправляются только по вашему '
+          'запросу и не содержат персональных данных.\n\n'
+          '6. Обновления\n'
+          'При обновлении приложения данные остаются на устройстве и '
+          'не удаляются. Если вы не пользуетесь облачным резервным '
+          'копированием, рекомендуем создавать резервные копии '
+          'самостоятельно.\n\n'
+          '7. Безопасность\n'
+          'Мы принимаем разумные меры для защиты ваших данных, однако '
+          'ни один метод передачи данных через интернет не является '
+          'абсолютно безопасным.\n\n'
+          '8. Контакты\n'
+          'По вопросам конфиденциальности, а также для запроса удаления '
+          'данных с сервера обращайтесь:\n'
+          'bnutssuz@gmail.com',
       'settings_got_it': 'Понятно',
       'settings_lang_ru': 'Рус',
       'settings_lang_en': 'Eng',
       'settings_lang_uz': 'O\'z',
+      'settings_account': 'Аккаунт',
+      'account_connect_telegram': 'Войти через Telegram',
+      'account_try_again': 'Попробовать снова',
+      'account_login_error': 'Не удалось начать вход. Попробуйте ещё раз',
+      'account_backup_now': 'Сохранить в облако',
+      'account_restore': 'Восстановить из облака',
+      'account_sign_out': 'Выйти',
+      'account_backup_confirm_title': 'Сохранить в облако?',
+      'account_backup_confirm_body':
+          'Текущие данные на этом устройстве заменят резервную копию в облаке.',
+      'account_restore_confirm_title': 'Восстановить из облака?',
+      'account_restore_confirm_body':
+          'Все данные на этом устройстве будут заменены облачной копией. Это действие нельзя отменить.',
+      'account_backup_success': 'Данные сохранены в облако',
+      'account_restore_success': 'Данные восстановлены',
+      'account_sync_error': 'Не удалось выполнить синхронизацию',
+      'account_sign_out_confirm_title': 'Выйти из аккаунта?',
+      'account_sign_out_confirm_body':
+          'Локальные данные останутся на устройстве. Облачная копия тоже сохранится — вы сможете войти снова в любой момент.',
     },
 
     'en': {
@@ -340,15 +399,72 @@ class AppStrings {
       'settings_privacy': 'Privacy Policy',
       'settings_version': 'App Version',
       'settings_privacy_text':
-          'All car and service data is stored locally '
-          'on your device and is never uploaded '
-          'to external servers.\n\n'
-          'The app does not collect personal data '
-          'and does not require registration.',
+          'BnGarage respects your privacy.\n\n'
+          '1. Data Collection\n'
+          'By default, the app does NOT collect any personal data, '
+          'analytics, cookies, or device identifiers and works fully '
+          'locally. If you choose to sign in with Telegram, we receive '
+          'your Telegram ID, username, first name, last name, and '
+          'profile photo link from Telegram — used solely to identify '
+          'your account.\n\n'
+          '2. Data Storage\n'
+          'Without Telegram sign-in, all data — cars, service records, '
+          'reminders, and photos — is stored exclusively locally on '
+          'your device and never sent anywhere. After signing in with '
+          'Telegram, this same data is additionally backed up to our '
+          'server (over an encrypted connection) so you don\'t lose it '
+          'if you change or reset your device.\n\n'
+          '3. Cloud Backup & Telegram\n'
+          'Signing in with Telegram is entirely optional — without it, '
+          'the app works exactly as described in section 2. Once '
+          'signed in, backups run automatically whenever your data '
+          'changes, and also on demand via "Backup now". You can '
+          'restore your data on a new device via "Restore from backup". '
+          'You can sign out and request deletion of your server data '
+          'at any time.\n\n'
+          '4. Photos\n'
+          'Car photos are saved in app storage and, if Telegram '
+          'sign-in is enabled, in your server-side backup. We do not '
+          'share them with third parties.\n\n'
+          '5. Notifications\n'
+          'Service reminders are processed locally on the device. '
+          'Push notifications are sent only at your request '
+          'and do not contain personal data.\n\n'
+          '6. Updates\n'
+          'When updating the app, data remains on the device and is '
+          'not deleted. If you don\'t use cloud backup, we recommend '
+          'creating backups yourself.\n\n'
+          '7. Security\n'
+          'We take reasonable measures to protect your data; '
+          'however, no method of data transmission over the internet '
+          'is absolutely secure.\n\n'
+          '8. Contact\n'
+          'For privacy questions, or to request deletion of your '
+          'server data, contact:\n'
+          'bnutssuz@gmail.com',
       'settings_got_it': 'Got it',
       'settings_lang_ru': 'Rus',
       'settings_lang_en': 'Eng',
       'settings_lang_uz': 'O\'z',
+      'settings_account': 'Account',
+      'account_connect_telegram': 'Sign in with Telegram',
+      'account_try_again': 'Try again',
+      'account_login_error': 'Couldn\'t start sign-in. Please try again',
+      'account_backup_now': 'Backup now',
+      'account_restore': 'Restore from backup',
+      'account_sign_out': 'Sign out',
+      'account_backup_confirm_title': 'Backup now?',
+      'account_backup_confirm_body':
+          'This device\'s current data will overwrite your cloud backup.',
+      'account_restore_confirm_title': 'Restore from backup?',
+      'account_restore_confirm_body':
+          'All data on this device will be overwritten with your cloud backup. This cannot be undone.',
+      'account_backup_success': 'Backed up to the cloud',
+      'account_restore_success': 'Data restored',
+      'account_sync_error': 'Sync failed',
+      'account_sign_out_confirm_title': 'Sign out?',
+      'account_sign_out_confirm_body':
+          'Local data stays on this device. Your cloud backup stays too — you can sign in again anytime.',
     },
 
     'uz': {
@@ -356,11 +472,14 @@ class AppStrings {
       'onb_welcome_title': 'Xush kelibsiz',
       'onb_welcome_desc': 'BnGarage — shaxsiy garaj\nsizning cho\'ntakingizda',
       'onb_cars_title': 'Sizning avtomobillaringiz',
-      'onb_cars_desc': 'Avtomobillar qo\'shing, rasmlarni\nsaqlang va barcha muhim ma\'lumotlarni',
+      'onb_cars_desc':
+          'Avtomobillar qo\'shing, rasmlarni\nsaqlang va barcha muhim ma\'lumotlarni',
       'onb_service_title': 'Xizmat tarixi',
-      'onb_service_desc': 'Har bir moy almashtirish,\nfiltrlar va qismlar almashtirishni qayd eting',
+      'onb_service_desc':
+          'Har bir moy almashtirish,\nfiltrlar va qismlar almashtirishni qayd eting',
       'onb_reminders_title': 'Aqlli eslatmalar',
-      'onb_reminders_desc': 'Xizmatni o\'tkazib yubormang —\nyurish masofasi va sana bo\'yicha ogohlantirishlar',
+      'onb_reminders_desc':
+          'Xizmatni o\'tkazib yubormang —\nyurish masofasi va sana bo\'yicha ogohlantirishlar',
       'onb_setup_title': 'Sozlash',
       'onb_lang_label': 'Interfeys tili',
       'onb_theme_label': 'Ilova mavzusi',
@@ -512,14 +631,74 @@ class AppStrings {
       'settings_privacy': 'Maxfiylik siyosati',
       'settings_version': 'Ilova versiyasi',
       'settings_privacy_text':
-          'Barcha avtomobil va xizmat ma\'lumotlari\n'
-          'qurilmangizda mahalliy saqlanadi va tashqi\n'
-          'serverlarga yuklanmaydi.\n\n'
-          'Ilova shaxsiy ma\'lumotlarni to\'playdi\n'
-          'va ro\'yxatdan o\'tishni talab qilmaydi.',
+          'BnGarage maxfiylikni hurmat qiladi.\n\n'
+          '1. Ma\'lumotlarni yig\'ish\n'
+          'Odatiy holatda ilova shaxsiy ma\'lumot, analitika, '
+          'cookie-fayllar yoki qurilma identifikatorlarini to\'plamaydi '
+          'va to\'liq mahalliy ishlaydi. Agar siz Telegram orqali '
+          'kirishni tanlasangiz, biz Telegram\'dan sizning ID, '
+          'username, ism, familiya va profil rasmi havolangizni '
+          'olamiz — faqat hisobingizni aniqlash uchun.\n\n'
+          '2. Ma\'lumotlarni saqlash\n'
+          'Telegram orqali kirmasangiz, barcha ma\'lumotlar — '
+          'avtomobillar, xizmat yozuvlari, eslatmalar va fotosuratlar — '
+          'faqat qurilmangizda mahalliy saqlanadi va hech qayerga '
+          'yuborilmaydi. Telegram orqali kirgandan so\'ng, shu '
+          'ma\'lumotlar qo\'shimcha ravishda serverimizga (shifrlangan '
+          'ulanish orqali) zaxiralanadi — bu qurilmangizni almashtirganda '
+          'yoki qayta o\'rnatganda ma\'lumotlarni yo\'qotmaslik uchun.\n\n'
+          '3. Bulutga zaxiralash va Telegram\n'
+          'Telegram orqali kirish butunlay ixtiyoriy — usiz ilova '
+          '2-bandda tasvirlanganidek ishlaydi. Kirgandan so\'ng, '
+          'ma\'lumotlar o\'zgarganda zaxiralash avtomatik ishga tushadi, '
+          'shuningdek «Bulutga saqlash» tugmasi orqali qo\'lda ham. '
+          'Yangi qurilmada ma\'lumotlarni «Bulutdan tiklash» tugmasi '
+          'orqali tiklashingiz mumkin. Istalgan vaqtda chiqishingiz va '
+          'serverdagi ma\'lumotlaringizni o\'chirishni so\'rashingiz '
+          'mumkin.\n\n'
+          '4. Fotosuratlar\n'
+          'Avtomobil fotosuratlari ilova xotirasida, Telegram orqali '
+          'kirish yoqilgan bo\'lsa esa serverdagi zaxira nusxada ham '
+          'saqlanadi. Biz ularni uchinchi shaxslarga uzatmaymiz.\n\n'
+          '5. Bildirishnomalar\n'
+          'Xizmat eslatmalari qurilmada mahalliy qayta ishlanadi. '
+          'Push-bildirishnomalar faqat so\'rovingiz bo\'yicha '
+          'yuboriladi va shaxsiy ma\'lumot o\'z ichiga olmaydi.\n\n'
+          '6. Yangilanishlar\n'
+          'Ilovani yangilaganda ma\'lumotlar qurilmada qoladi va '
+          'o\'chirilmaydi. Bulutga zaxiralashdan foydalanmasangiz, '
+          'zaxira nusxalarni o\'zingiz yaratishni tavsiya qilamiz.\n\n'
+          '7. Xavfsizlik\n'
+          'Biz ma\'lumotlaringizni himoya qilish uchun '
+          'maqbul chora-tadbirlar qabul qilamiz, ammo '
+          'internet orqali ma\'lumot uzatishning hech qanday '
+          'usuli mutlaqo xavfsiz emas.\n\n'
+          '8. Aloqa\n'
+          'Maxfiylik masalalari, shuningdek serverdagi ma\'lumotlaringizni '
+          'o\'chirishni so\'rash uchun murojaat qiling:\n'
+          'bnutssuz@gmail.com',
       'settings_got_it': 'Tushundim',
       'settings_lang_ru': 'Rus',
       'settings_lang_en': 'Eng',
+      'settings_account': 'Hisob',
+      'account_connect_telegram': 'Telegram orqali kirish',
+      'account_try_again': 'Qayta urinib ko\'ring',
+      'account_login_error': 'Kirishni boshlab bo\'lmadi. Qayta urinib ko\'ring',
+      'account_backup_now': 'Bulutga saqlash',
+      'account_restore': 'Bulutdan tiklash',
+      'account_sign_out': 'Chiqish',
+      'account_backup_confirm_title': 'Bulutga saqlansinmi?',
+      'account_backup_confirm_body':
+          'Ushbu qurilmadagi joriy ma\'lumotlar bulutdagi zaxira nusxani almashtiradi.',
+      'account_restore_confirm_title': 'Bulutdan tiklansinmi?',
+      'account_restore_confirm_body':
+          'Ushbu qurilmadagi barcha ma\'lumotlar bulutdagi nusxa bilan almashtiriladi. Buni bekor qilib bo\'lmaydi.',
+      'account_backup_success': 'Bulutga saqlandi',
+      'account_restore_success': 'Ma\'lumotlar tiklandi',
+      'account_sync_error': 'Sinxronlash amalga oshmadi',
+      'account_sign_out_confirm_title': 'Hisobdan chiqilsinmi?',
+      'account_sign_out_confirm_body':
+          'Mahalliy ma\'lumotlar qurilmada qoladi. Bulutdagi zaxira nusxa ham saqlanib qoladi — istalgan vaqtda qayta kirishingiz mumkin.',
     },
   };
 
